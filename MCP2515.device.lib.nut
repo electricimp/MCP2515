@@ -5,9 +5,9 @@
 // connection to the protocol engine.
 
 // TX Buffer addresses
-const MCP2515_TX_BUFF_0_CTRL_REG  = 0x30; 
-const MCP2515_TX_BUFF_1_CTRL_REG  = 0x40; 
-const MCP2515_TX_BUFF_2_CTRL_REG  = 0x50; 
+const MCP2515_TX_BUFF_0_CTRL_REG  = 0x30;
+const MCP2515_TX_BUFF_1_CTRL_REG  = 0x40;
+const MCP2515_TX_BUFF_2_CTRL_REG  = 0x50;
 
 const MCP2515_TX_RTS_CTRL_STAT_REG = 0x0D;
 
@@ -78,7 +78,7 @@ const MCP2515_RX_BUFF_CTRL_STAT_REG = 0x0C; // used
 // const MCP2515_RX_BUFF_0_DATA_LEN_CODE = 0x65; // not used
 // const MCP2515_RX_BUFF_1_DATA_LEN_CODE = 0x75; // not used
 
-// const MCP2515_RX_BUFF_0_DATA_BYTE_0 = 0x66; // not used 
+// const MCP2515_RX_BUFF_0_DATA_BYTE_0 = 0x66; // not used
 // const MCP2515_RX_BUFF_0_DATA_BYTE_1 = 0x67; // not used
 // const MCP2515_RX_BUFF_0_DATA_BYTE_2 = 0x68; // not used
 // const MCP2515_RX_BUFF_0_DATA_BYTE_3 = 0x69; // not used
@@ -96,12 +96,12 @@ const MCP2515_RX_BUFF_CTRL_STAT_REG = 0x0C; // used
 // const MCP2515_RX_BUFF_1_DATA_BYTE_6 = 0x7C; // not used
 // const MCP2515_RX_BUFF_1_DATA_BYTE_7 = 0x7D; // not used
 
-const MCP2515_RX_FILTER_0_STAND_ID_HIGH = 0x00; // used 
+const MCP2515_RX_FILTER_0_STAND_ID_HIGH = 0x00; // used
 const MCP2515_RX_FILTER_1_STAND_ID_HIGH = 0x04; // used
-const MCP2515_RX_FILTER_2_STAND_ID_HIGH = 0x08; // used 
-const MCP2515_RX_FILTER_3_STAND_ID_HIGH = 0x10; // used 
-const MCP2515_RX_FILTER_4_STAND_ID_HIGH = 0x14; // used 
-const MCP2515_RX_FILTER_5_STAND_ID_HIGH = 0x18; // used 
+const MCP2515_RX_FILTER_2_STAND_ID_HIGH = 0x08; // used
+const MCP2515_RX_FILTER_3_STAND_ID_HIGH = 0x10; // used
+const MCP2515_RX_FILTER_4_STAND_ID_HIGH = 0x14; // used
+const MCP2515_RX_FILTER_5_STAND_ID_HIGH = 0x18; // used
 
 // const MCP2515_RX_FILTER_0_STAND_ID_LOW = 0x01; // not used
 // const MCP2515_RX_FILTER_1_STAND_ID_LOW = 0x05; // not used
@@ -184,7 +184,7 @@ const MCP2515_INIT_DEFAULT_PHASE_SEG_1 = 1;
 const MCP2515_INIT_DEFAULT_PHASE_SEG_2 = 1;
 const MCP2515_INIT_DEFAULT_SJW         = 1;
 
-// Settings 
+// Settings
 const MCP2515_SAM_1X         = 0x00;
 const MCP2515_SAM_3X         = 0x40;
 
@@ -215,18 +215,18 @@ const MCP2515_TX1RTS_PIN_RTS    = 0x02;
 const MCP2515_TX2RTS_PIN_RTS    = 0x04;
 
 class MCP2515 {
-    
+
     _spi = null;
     _cs  = null;
-    
+
     // Takes a configured spi and the chip select pin
     constructor(spi, cs = null) {
         _spi = spi;    // spiBCAD on FB gateway
         _cs  = cs;     // pinD on FB gateway
-        
+
         if (_cs != null) _cs.configure(DIGITAL_OUT, 1);
     }
-    
+
     // Reinitializes the internal registers
     // After reset MCP2515 will be in config op mode
     // Sending reset cmd is the same as using the reset pin
@@ -234,26 +234,26 @@ class MCP2515 {
     function reset() {
         local data = blob(1);
         data.writen(MCP2515_CMD_RESET, 'b');
-        
+
         (_cs) ? _cs.write(0) : _spi.chipselect(1);
         _spi.writeread(data);
         (_cs) ? _cs.write(1) : _spi.chipselect(0);
-        
+
         imp.sleep(0.1);
     }
 
     // Declare controller initialization parameters
     // enMaskFilt - sets the RX buffer id mode
     // Baud rate preScaler, prop seg, phase seg 1, phase seg 2 (min val is 2), SJW (default 1)
-    function init(opts) {
+    function init(opts = {}) {
         // Reset to default state
         reset();
-        
+
         // Set chip into config mode (shouldn't be needed based on datasheet reset info)
         local res = _getReg(MCP2515_CAN_STATUS_REG);
         if ((res[0] & MCP2515_OP_MODE_MASK) != MCP2515_OP_MODE_CONFIG) setOpMode(MCP2515_OP_MODE_CONFIG);
-        
-        // Get settings from options passed in or set defaults  
+
+        // Get settings from options passed in or set defaults
         local enMaskFilt   = ("enFiltering" in opts) ? opts.enFiltering : false;
         local opMode       = ("opMode" in opts) ? opts.opMode : MCP2515_OP_MODE_LOOPBACK;
         local brp          = ("baudRatePre" in opts) ? opts.baudRatePre : MCP2515_INIT_DEFAULT_BRP;
@@ -265,12 +265,12 @@ class MCP2515 {
         local bltMode      = 0x80; // CONFIG 2 Register setting not exposed to user
         local sof          = ("enSOF" in opts && opts.enSOF) ? 0x80 : 0x00;
         local enWakeFilter = ("enWakeFilter" in opts && opts.enWakeFilter) ? 0x40 : 0x00
-        local intSettings  = ("intConfig" in opts) ? opts.intConfig : MCP2515_EN_INT_RXB0 | MCP2515_EN_INT_RXB1;
-        local rxPins       = ("configRxPins" in opts) ? opts.configRxPins : MCP2515_RX0BF_PIN_EN_DIG_OUT_HIGH | MCP2515_RX1BF_PIN_EN_DIG_OUT_HIGH;
+        local intSettings  = ("intConfig" in opts) ? opts.intConfig : MCP2515_DISABLE_ALL_INTS;
+        local rxPins       = ("configRxPins" in opts) ? opts.configRxPins : MCP2515_RXBF_PINS_DISABLE;
         local txPins       = ("configTxPins" in opts) ? opts.configTxPins : MCP2515_TXRTS_PINS_DIG_IN;
 
         // Set Configuration filters
-        // Note: Register values are one less than the actual values for BRP, propSeg, 
+        // Note: Register values are one less than the actual values for BRP, propSeg,
         // phaseSeg1, phaseSeg2, and SJW
 
         // MCP2515_CONFIG_REG_1 - SJW - 1 = (6-7), BRP - 1 = (5-0)
@@ -283,40 +283,40 @@ class MCP2515 {
 
         // MCP2515_CONFIG_REG_3 - SOF(7) = 1, WAKFIL(6) = 0, NA(5-3) = 0, Phase2Seg - 1 (0-2)
         val = sof | enWakeFilter | (phaseSeg2 - 1);
-        _writeReg(MCP2515_CONFIG_REG_3, val);     
-        
+        _writeReg(MCP2515_CONFIG_REG_3, val);
+
         // Initialize Buffers, Masks and Filters (set all filter and mask reg to 0x00)
         clearFiltersAndMasks();
 
         // Clear TX Control and Buffers (30 40 50 60 70)
         val = _createZeroFilledBlob(13);
-        _writeReg(MCP2515_TX_BUFF_0_CTRL_REG, val); 
-        _writeReg(MCP2515_TX_BUFF_1_CTRL_REG, val); 
-        _writeReg(MCP2515_TX_BUFF_2_CTRL_REG, val); 
-        
+        _writeReg(MCP2515_TX_BUFF_0_CTRL_REG, val);
+        _writeReg(MCP2515_TX_BUFF_1_CTRL_REG, val);
+        _writeReg(MCP2515_TX_BUFF_2_CTRL_REG, val);
+
         // Clear RX Ctrl
         _writeReg(MCP2515_RX_BUFF_0_CTRL_REG, 0x00);
         _writeReg(MCP2515_RX_BUFF_1_CTRL_REG, 0x00);
-        
+
         // Configure Interrupts
         configureInterrupts(intSettings);
         // Configure RX Pins
         configureRxBuffPins(rxPins);
         // Configure TX RTS Pins
         configureTxRtsPins(txPins);
-        
+
         // Enable msg filtering
         enableMasksAndFilters(enMaskFilt);
-        
+
         // Set Can Control Mode
-        res = setOpMode(opMode);
+        setOpMode(opMode);
     }
 
     function setOpMode(mode) {
         local res = _modifyReg(MCP2515_CAN_CTRL_REG, MCP2515_OP_MODE_MASK, mode);
         return _getReg(MCP2515_CAN_STATUS_REG)[0] & MCP2515_OP_MODE_MASK;
     }
-    
+
     function configureInterrupts(settings) {
         _writeReg(MCP2515_CAN_INT_EN_REG, settings);
     }
@@ -328,10 +328,10 @@ class MCP2515 {
     function configureTxRtsPins(settings) {
         _writeReg(MCP2515_TX_RTS_CTRL_STAT_REG, settings);
     }
-    
+
     function clearFiltersAndMasks() {
         val = _createZeroFilledBlob(12);
-        _writeReg(MCP2515_RX_FILTER_0_STAND_ID_HIGH, val); 
+        _writeReg(MCP2515_RX_FILTER_0_STAND_ID_HIGH, val);
         _writeReg(MCP2515_RX_FILTER_3_STAND_ID_HIGH, val);
 
         val = _createZeroFilledBlob(8);
@@ -363,7 +363,7 @@ class MCP2515 {
                 break;
         }
     }
-    
+
     // NOTE: Filters 0 & 1 filter buffer 0, filters 2 - 5 filter buffer 1
     function configureFilter(filterNum, ext, id) {
         switch (filterNum) {
@@ -390,7 +390,7 @@ class MCP2515 {
                 break;
         }
     }
-    
+
     function readMsg() {
         // Check for msgs in buffer 0 and 1
         local status = _readStatus();
@@ -410,10 +410,10 @@ class MCP2515 {
         } else {
             server.log("No msg found.");
         }
-        
+
         return msg;
     }
-    
+
     function getError() {
         local res = _getReg(MCP2515_ERROR_FLAG_REG);
         if (typeof res == "blob" && res.len() == 1) {
@@ -430,19 +430,19 @@ class MCP2515 {
             if (errorFlagReg & 0x80) server.log("TX or RX Error Warning");
         }
     }
-    
+
     function _configureMasksAndFilters(startingAddr, ext, id) {
         local data = blob(4);
         // 0 = Standard High reg data (bits 3-10 of standard id)
         // 1 = Standard Low reg data (bits 0-2 of standard id, ext filter enable, and bits 16-17 ext id)
         // 2 = Extened High reg data (bits 8-15 of ext id)
         // 3 = Extended Low reg data (bits 0-7 of ext id)
-        
-        // Note: Each filter/mask id will be written to both the standard and 
+
+        // Note: Each filter/mask id will be written to both the standard and
         // extened registers, unkown bits will be set to 0 (no mask/filter)
-        
+
         // 0 | 0000 | 0000 | 0000 | 0000 | 0 ** 000 | 0000 | 0000 |
-        
+
         //                               | 0 ** 111 | 1111 | 1000 |
         //                                                 | 0111 |
 
@@ -457,41 +457,41 @@ class MCP2515 {
         data[2] = (id & 0x7F80000) >> 19;
         // Lower bits of Extended id (grab bits 0-7 of id)
         data[3] = id & 0x7F800 >> 11;
-        
+
         // If ext filter enabled write 1 to reg bit 3
         local extEn = (ext) ? 1 : 0;
-        // Lower bits stand (grab 0-2 of id) write to reg bits 5-7, 
-        // Top bits Ext (grab 16-17 of id) write to reg bits 0-1, 
-        data[1] = (id & 0x07) << 5 | extEn << 3 | (id << 27) & 0x03; 
-        
+        // Lower bits stand (grab 0-2 of id) write to reg bits 5-7,
+        // Top bits Ext (grab 16-17 of id) write to reg bits 0-1,
+        data[1] = (id & 0x07) << 5 | extEn << 3 | (id << 27) & 0x03;
+
         // Set to configure mode
         local mode = _getReg(MCP2515_CAN_STATUS_REG)[0] & MCP2515_OP_MODE_MASK;
         local res = setOpMode(MCP2515_OP_MODE_CONFIG);
-        
+
         // Update register
         res = _writeReg(startingAddr, data);
-        
+
         // Set back to non-config mode
         res = setOpMode(mode);
     }
-    
+
     function _readMsgFromBuffer(buffCtrlAddr) {
         local res = _getReg(buffCtrlAddr, 6);
         server.log("Get readMsg response: ");
         server.log(res);
         // [0] - CTRL, [1] - StandId high, [2] - StandId low
         // [3] - ExtId high, [4] - ExtId low, [5] - Data len
-        
+
         // 0x-0 - (3) remote transfer requested
         // 0x-1 - stand id high (3-10)
-        // 0x-2 - (0-1) ext id MSB (16-17), 
-        //        (3) extend flag ext = 1, stand = 0, 
-        //        (4) stand frame remote=1, 
+        // 0x-2 - (0-1) ext id MSB (16-17),
+        //        (3) extend flag ext = 1, stand = 0,
+        //        (4) stand frame remote=1,
         //        (5-7) stand id (0-2)
         // 0x-3 - extended id high (8-15)
         // 0x-4 - extended id low (0-7)
-        // 0x-5 - (0-3) data length, 
-        //        (6) extended frame remote=1,  
+        // 0x-5 - (0-3) data length,
+        //        (6) extended frame remote=1,
 
         local rtr;
         local ext = (res[2] & 0x08) == 1;
@@ -501,21 +501,21 @@ class MCP2515 {
         // Remote transfer request received
         local rtrReceived = (res[0] & 0x08) == 1;
         if (ext) {
-            // We have an extended frame msg 
+            // We have an extended frame msg
             // Remote transmit requested
             rtr = (res[5] & 0x40) == 1;
             // Update msg ID to include extended ID
-            id = (res[2] & 0x03) << 27 | res[3] << 19 | res[4] << 11 | id; 
+            id = (res[2] & 0x03) << 27 | res[3] << 19 | res[4] << 11 | id;
         } else {
             // We have a standard frame msg, check remote transmit request
             rtr = (res[2] & 0x10) == 1;
         }
-        
+
         // Read data out of buffer
         local data = _getReg(buffCtrlAddr + 6, dataLen);
         return {"extended" : ext, "rtr" : rtr, "rtrReceived" : rtrReceived, "id" : id, "msg" : data};
     }
-    
+
     function _writeReg(addr, val) {
         local data = blob();
         data.writen(MCP2515_CMD_WRITE, 'b');
@@ -525,14 +525,14 @@ class MCP2515 {
         } else {
             data.writen(val, 'b');
         }
-        
+
         (_cs) ? _cs.write(0) : _spi.chipselect(1);
         local res = _spi.writeread(data);
         (_cs) ? _cs.write(1) : _spi.chipselect(0);
-        
+
         return res;
     }
-    
+
     function _getReg(addr, numBytes = 1) {
         local data = blob();
         data.writen(MCP2515_CMD_READ, 'b');
@@ -540,41 +540,41 @@ class MCP2515 {
         for (local i = 0; i < numBytes; i++) {
             data.writen(0x00, 'b');
         }
-        
+
         (_cs) ? _cs.write(0) : _spi.chipselect(1);
         local res = _spi.writeread(data);
         (_cs) ? _cs.write(1) : _spi.chipselect(0);
-        
+
         res.seek(2, 'b');
         return (numBytes > 0) ? res.readblob(numBytes) : null;
     }
- 
+
     function _modifyReg(addr, mask, val) {
         local data = blob(4);
         data.writen(MCP2515_CMD_BIT_MODIFY, 'b');
         data.writen(addr, 'b');
         data.writen(mask, 'b');
         data.writen(val, 'b');
-        
+
         (_cs) ? _cs.write(0) : _spi.chipselect(1);
         local res = _spi.writeread(data);
         (_cs) ? _cs.write(1) : _spi.chipselect(0);
-        
+
         return res;
-    }   
-    
+    }
+
     function _readStatus() {
         local data = blob();
         data.writen(MCP2515_CMD_READ_STATUS, 'b');
         data.writen(0xFF, 'b');
-        
+
         (_cs) ? _cs.write(0) : _spi.chipselect(1);
         local res = _spi.writeread(data);
         (_cs) ? _cs.write(1) : _spi.chipselect(0);
 
         return res[1];
     }
-    
+
     function _createZeroFilledBlob(length) {
         local b = blob(length);
         for (local i = 0; i < b.len(); i++) {
