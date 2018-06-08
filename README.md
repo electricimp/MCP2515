@@ -93,7 +93,7 @@ Changes the opertation mode to the parameter *mode*.
 #### Operation Modes ####
 
 | Mode Constants | Description |
-| --- |
+| --- | --- |
 | MCP2515_OP_MODE_NORMAL | Normal mode is the standard operating mode. The device actively monitors all bus messages, and generates acks, error frames, etc. This is the only mode that will transmit messages over the CAN bus. |
 | MCP2515_OP_MODE_SLEEP | Internal Sleep mode used to minimize the current consumption of the device. WakeUp can be configured to wake from sleep mode. When device wakes it will default to Listen Only Mode. |
 | MCP2515_OP_MODE_LOOPBACK | Allows internal transmission of messages from the transmit buffers to the receive buffers without actually transmitting messages on the CAN bus. |
