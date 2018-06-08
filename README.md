@@ -102,12 +102,13 @@ Changes the opertation mode to the parameter *mode*.
 
 #### Return Value ####
 
-Nothing.
+A Mode Constant. This is the mode the chip is set to after updating the mode. Use this to confirm the mode is set correctly.
 
 #### Example ####
 
 ```
-canBus.setOpMode(MCP2515_OP_MODE_NORMAL);
+local mode = canBus.setOpMode(MCP2515_OP_MODE_NORMAL);
+if (mode != MCP2515_OP_MODE_NORMAL) server.error("Error: Not in normal mode.");
 ```
 
 ### reset() ###
@@ -126,17 +127,37 @@ canBus.reset();
 
 ### configureInterrupts(*settings*)
 
+This method configures what interrupts if any will trigger the inerrupt pin to change state.
+
+#### Parameters ####
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| *settings* | constant(s) | N/A | Use the *Interrupt Constants* below to select the desired interrupt(s). If more than one interrupt is desired the constants can be *or-ed*. |
+
 #### Interrupt Settings ####
 
-MCP2515_DISABLE_ALL_INTS
-MCP2515_EN_INT_RXB0
-MCP2515_EN_INT_RXB1
-MCP2515_EN_INT_TXB0
-MCP2515_EN_INT_TXB1
-MCP2515_EN_INT_TXB2
-MCP2515_EN_INT_ERR
-MCP2515_EN_INT_WAKE
-MCP2515_EN_INT_MSG_ERR
+| Interrupt Constants | Description |
+| --- | --- |
+| MCP2515_DISABLE_ALL_INTS | Disables all interrupts |
+| MCP2515_EN_INT_RXB0 | Enables an interrupt on RX Buffer 0 |
+| MCP2515_EN_INT_RXB1 | Enables an interrupt on RX Buffer 1 |
+| MCP2515_EN_INT_TXB0 | Enables an interrupt on TX Buffer 0 |
+| MCP2515_EN_INT_TXB1 | Enables an interrupt on TX Buffer 1 |
+| MCP2515_EN_INT_TXB2 | Enables an interrupt on TX Buffer 2 |
+| MCP2515_EN_INT_ERR | Enables an interrupt when error occurs |
+| MCP2515_EN_INT_WAKE | Enables an interrupt when chip wakes from sleep mode |
+| MCP2515_EN_INT_MSG_ERR | Enables an interrupt when an error occurs during message transmission or reception |
+
+#### Return Value ####
+
+Nothing.
+
+#### Example ####
+
+```
+canBus.configureInterrupts(MCP2515_EN_INT_RXB0 | MCP2515_EN_INT_RXB1);
+```
 
 ### configureRxBuffPins(*settings*)
 
