@@ -200,6 +200,17 @@ This method configures TX0RTS, TX1RTS and TX2RTS pins. See configuration setting
 | MCP2515_TX1RTS_PIN_RTS | Configures TX1RTS as request message transmission of TXB0 buffer (on falling edge) |
 | MCP2515_TX2RTS_PIN_RTS | Configures TX2RTS as request message transmission of TXB0 buffer (on falling edge) |
 
+#### Return Value ####
+
+Nothing.
+
+#### Example ####
+
+```
+// Enable TXRTS pins as digial inputs
+canBus.configureRxBuffPins(MCP2515_TXRTS_PINS_DIG_IN);
+```
+
 ### clearFiltersAndMasks()
 
 ### enableMasksAndFilters(*enable*)
