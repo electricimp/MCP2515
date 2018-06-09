@@ -113,7 +113,7 @@ if (mode != MCP2515_OP_MODE_NORMAL) server.error("Error: Not in normal mode.");
 
 ### reset() ###
 
-This method triggers a SPI reset. This is functionally equivalent to a harware reset. It is important to reset after power-up to ensure that the logic and registers are in their default state. The init method will trigger a reset before configuring options. After reset the MCP2515 will automatically be set to *Configuration Mode*.
+This method triggers a SPI reset. This is functionally equivalent to a harware reset. It is important to reset after power-up to ensure that the logic and registers are in their default state. The init method will trigger a reset before configuring options. After reset the MCP2515 will automatically be set into *Configuration Mode*.
 
 #### Return Value ####
 
@@ -156,29 +156,49 @@ Nothing.
 #### Example ####
 
 ```
+// Enable interrupts on all received messages
 canBus.configureInterrupts(MCP2515_EN_INT_RXB0 | MCP2515_EN_INT_RXB1);
 ```
 
 ### configureRxBuffPins(*settings*)
 
+This method configures RX0BF and RX1BF pins. See configuration settings below. To configure both pins constants can be *or-ed*.
+
 #### RX Buffer Pin Settings ####
 
-MCP2515_RXBF_PINS_DISABLE
-MCP2515_RX0BF_PIN_EN_INT
-MCP2515_RX0BF_PIN_EN_DIG_OUT_HIGH
-MCP2515_RX0BF_PIN_EN_DIG_OUT_LOW
-MCP2515_RX1BF_PIN_EN_INT
-MCP2515_RX1BF_PIN_EN_DIG_OUT_HIGH
-MCP2515_RX1BF_PIN_EN_DIG_OUT_LOW
+| RX Buffer Pin Constants | Description |
+| --- | --- |
+| MCP2515_RXBF_PINS_DISABLE | Disables pin function for RX0BF and RX1BF, pins go to a high-impedance state |
+| MCP2515_RX0BF_PIN_EN_INT | RX0BF pin is configured as an interrupt when a valid message is loaded into RXB0 |
+| MCP2515_RX0BF_PIN_EN_DIG_OUT_HIGH | RX0BF pin is configured as a digital output, starting state high |
+| MCP2515_RX0BF_PIN_EN_DIG_OUT_LOW | RX0BF pin is configured as a digital output, starting state low |
+| MCP2515_RX1BF_PIN_EN_INT | RX1BF pin is configured as an interrupt when a valid message is loaded into RXB0 |
+| MCP2515_RX1BF_PIN_EN_DIG_OUT_HIGH | RX1BF pin is configured as a digital output, starting state high |
+| MCP2515_RX1BF_PIN_EN_DIG_OUT_LOW | RX1BF pin is configured as a digital output, starting state low |
+
+#### Return Value ####
+
+Nothing.
+
+#### Example ####
+
+```
+// Enable interrupts on all received messages
+canBus.configureRxBuffPins(MCP2515_RX0BF_PIN_EN_DIG_OUT_HIGH | MCP2515_RX1BF_PIN_EN_DIG_OUT_HIGH);
+```
 
 ### configureTxRtsPins(*settings*)
 
+This method configures TX0RTS, TX1RTS and TX2RTS pins. See configuration settings below. To configure multiple RTS pins constants can be *or-ed*.
+
 #### TX RTS Pin Settings ####
 
-MCP2515_TXRTS_PINS_DIG_IN
-MCP2515_TX0RTS_PIN_RTS
-MCP2515_TX1RTS_PIN_RTS
-MCP2515_TX2RTS_PIN_RTS
+| TX RTS Pin Constants | Description |
+| --- | --- |
+| MCP2515_TXRTS_PINS_DIG_IN | Configure TX0RTS, TX1RTS, and TX2RTS as digital inputs |
+| MCP2515_TX0RTS_PIN_RTS | Configures TX0RTS as request message transmission of TXB0 buffer (on falling edge) |
+| MCP2515_TX1RTS_PIN_RTS | Configures TX1RTS as request message transmission of TXB0 buffer (on falling edge) |
+| MCP2515_TX2RTS_PIN_RTS | Configures TX2RTS as request message transmission of TXB0 buffer (on falling edge) |
 
 ### clearFiltersAndMasks()
 
