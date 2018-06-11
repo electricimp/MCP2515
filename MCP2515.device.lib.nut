@@ -332,7 +332,7 @@ class MCP2515 {
     }
 
     function clearFiltersAndMasks() {
-        val = _createZeroFilledBlob(12);
+        local val = _createZeroFilledBlob(12);
         _writeReg(MCP2515_RX_FILTER_0_STAND_ID_HIGH, val);
         _writeReg(MCP2515_RX_FILTER_3_STAND_ID_HIGH, val);
 
