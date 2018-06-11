@@ -179,10 +179,10 @@ This method configures RX0BF and RX1BF pins. See configuration settings below. T
 | RX Buffer Pin Constants | Description |
 | --- | --- |
 | MCP2515_RXBF_PINS_DISABLE | Disables pin function for RX0BF and RX1BF, pins go to a high-impedance state |
-| MCP2515_RX0BF_PIN_EN_INT | RX0BF pin is configured as an interrupt when a valid message is loaded into RXB0 |
+| MCP2515_RX0BF_PIN_EN_INT  | RX0BF pin is configured as an interrupt when a valid message is loaded into RXB0 |
 | MCP2515_RX0BF_PIN_EN_DIG_OUT_HIGH | RX0BF pin is configured as a digital output, starting state high |
 | MCP2515_RX0BF_PIN_EN_DIG_OUT_LOW | RX0BF pin is configured as a digital output, starting state low |
-| MCP2515_RX1BF_PIN_EN_INT | RX1BF pin is configured as an interrupt when a valid message is loaded into RXB0 |
+| MCP2515_RX1BF_PIN_EN_INT | RX1BF pin is configured as an interrupt when a valid message is loaded into RXB1 |
 | MCP2515_RX1BF_PIN_EN_DIG_OUT_HIGH | RX1BF pin is configured as a digital output, starting state high |
 | MCP2515_RX1BF_PIN_EN_DIG_OUT_LOW | RX1BF pin is configured as a digital output, starting state low |
 
@@ -213,8 +213,8 @@ This method configures TX0RTS, TX1RTS and TX2RTS pins. See configuration setting
 | --- | --- |
 | MCP2515_TXRTS_PINS_DIG_IN | Configure TX0RTS, TX1RTS, and TX2RTS as digital inputs |
 | MCP2515_TX0RTS_PIN_RTS | Configures TX0RTS as request message transmission of TXB0 buffer (on falling edge) |
-| MCP2515_TX1RTS_PIN_RTS | Configures TX1RTS as request message transmission of TXB0 buffer (on falling edge) |
-| MCP2515_TX2RTS_PIN_RTS | Configures TX2RTS as request message transmission of TXB0 buffer (on falling edge) |
+| MCP2515_TX1RTS_PIN_RTS | Configures TX1RTS as request message transmission of TXB1 buffer (on falling edge) |
+| MCP2515_TX2RTS_PIN_RTS | Configures TX2RTS as request message transmission of TXB2 buffer (on falling edge) |
 
 #### Return Value ####
 
