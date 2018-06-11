@@ -383,28 +383,28 @@ if (errors.errorFound) {
 Bit Timing notes from [Applicaton notes for MCP2510](http://ww1.microchip.com/downloads/en/AppNotes/00739a.pdf).
 
 Every bit time is made up of four segments:
-    1. Synchronization Segment (SyncSeg).
-    2. Propagation Segment (PropSeg).
-    3. Phase Segment 1 (PS1).
-    4. Phase Segment 2 (PS2).
+    1 Synchronization Segment (SyncSeg)
+    2 Propagation Segment (PropSeg)
+    3 Phase Segment 1 (PS1)
+    4 Phase Segment 2 (PS2)
 
 Each of these segments are made up of integer units called Time Quanta (TQ). The base TQ is defined as 2 Tosc. The TQ time can be modified by changing the “Baud Rate Prescaler”. The sample point occurs between PS1 and PS2 and is the point where the bit level is sampled to determine whether it is dominant or recessive. By changing the TQ number in the bit segments and/or the baud rate prescaler, it is possible to change the bit length and move the sample point around in the bit.
 
 | Sync Segment | Prop Segment | Phase 1 Segment | Phase 2 Segment |
 | ------------ | ------------ | --------------- | --------------- |
 | 1 TQ         | 1 - 8 TQ     | 1 - 8 TQ        | 2 - 8 TQ        |
-|              |              | Sample Point -> | <- Sample Point |
+|              |              | Sample Point ---> | <--- Sample Point |
 
 There are additional definitions that are needed to understand the bit timing settings:
-    • Information Processing Time (IPT) - The time it takes to determine the value of the bit. The IPT occurs after the sample point and is fixed at 2 TQ.
-    • Synchronization Jump Width (SJW) - Can be programmed from 1 - 4 TQ and is the amount that PS1 can lengthen or PS2 can shorten so the receiving node can maintain synchronization with the transmitter.
-    • Bus Delay Times (TDELAY) - This delay time is the physical delays as a result of the physical layer (length, material, transceiver characteristics, etc).
+    * Information Processing Time (IPT) - The time it takes to determine the value of the bit. The IPT occurs after the sample point and is fixed at 2 TQ.
+    * Synchronization Jump Width (SJW) - Can be programmed from 1 - 4 TQ and is the amount that PS1 can lengthen or PS2 can shorten so the receiving node can maintain synchronization with the transmitter.
+    * Bus Delay Times (TDELAY) - This delay time is the physical delays as a result of the physical layer (length, material, transceiver characteristics, etc).
 
 There are four rules that must be adhered to when programming the timing segments:
-    1. PS2 ≥ IPT: Phase Segment 2 must be greater than or equal to the Information Processing Time (IPT) so that the bit level can be determined and processed by the CAN module before the beginning of the next bit in the stream. The IPT = 2 TQ so PS2(min) = 2 TQ.
-    2. PropSeg + PS1 ≥ PS2: This requirement ensures the sample point is greater than 50% of the bit time.
-    3. PS2 > SJW: PS2 must be larger than the SJW to avoid shortening the bit time to before the sample point. For example, if PS2 = 2 and SJW = 3, then a resynchronization to shorten the bit would place the end of the bit time at 1 TQ before the sample point.
-    4. PropSeg + PS1 ≥ TDELAY: This requirement ensures there is adequate time before the sample point. In fact, the PropSeg should be set to compensate for physical bus delays.
+    1 PS2 ≥ IPT: Phase Segment 2 must be greater than or equal to the Information Processing Time (IPT) so that the bit level can be determined and processed by the CAN module before the beginning of the next bit in the stream. The IPT = 2 TQ so PS2(min) = 2 TQ
+    2 PropSeg + PS1 ≥ PS2: This requirement ensures the sample point is greater than 50% of the bit time
+    3 PS2 > SJW: PS2 must be larger than the SJW to avoid shortening the bit time to before the sample point. For example, if PS2 = 2 and SJW = 3, then a resynchronization to shorten the bit would place the end of the bit time at 1 TQ before the sample point
+    4 PropSeg + PS1 ≥ TDELAY: This requirement ensures there is adequate time before the sample point. In fact, the PropSeg should be set to compensate for physical bus delays
 
 
 ### Timing Suggestions ###
