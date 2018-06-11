@@ -321,10 +321,62 @@ canBus.clearFiltersAndMasks();
 
 ### readMsg()
 
+This method checks for messages, and if one if found it returns the message.
 
+#### Return Value ####
+
+A message table or `null` if no message is found.
+
+| Key | Value Type | Value |
+| --- | --- | --- |
+| id          | integer | Message identifier |
+| data        | blob    | Message data |
+| extended    | boolean | `true` if message is exteneded format |
+| rtr         | boolean | `true` if remote transmit requested |
+| rtrReceived | boolean | `true` if remote transfer request received |
+
+#### Example ####
+
+```
+// Enable interrupts on all received messages
+local msg = canBus.readMsg();
+if (msg != null) {
+    server.log("Message received with id: " + msg.id);
+    server.log(msg.data);
+}
+```
 
 ### getError()
 
+This method reads the error register and returns a table with error status'.
+
+#### Return Value ####
+
+An error status table. See table details below.
+
+| Key | Value Type | Value |
+| --- | --- | --- |
+| errorFound       | boolean | `true` if any error conditions have been detected |
+| rxB1Overflow     | boolean | `true` when a valid message is received for RX buffer 1 |
+| rxB0Overflow     | boolean | `true` when a valid message is received for RX buffer 0 |
+| txBusOff         | boolean | `true` when TX error counter reaches 255 |
+| txErrorPassive   | boolean | `true` when TX error counter reaches 128 |
+| rxErrorPassive   | boolean | `true` when RX error counter reaches 128 |
+| txErrorWarning   | boolean | `true` when TX error counter reaches 96 |
+| rxErrorWarning   | boolean | `true` when RX error counter reaches 96 |
+| txRxErrorWarning | boolean | `true` when TX or RX error counter is equal to or greater than 96 |
+
+#### Example ####
+
+```
+// Log errors
+local errors = canBus.getError();
+if (errors.errorFound) {
+    foreach(err, state in errors) {
+        if (state) server.log(err);
+    }
+}
+```
 
 ## Timing Notes ##
 

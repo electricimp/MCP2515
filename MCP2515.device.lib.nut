@@ -397,17 +397,17 @@ class MCP2515 {
 
         local msg = null;
         if (status & 0x01) {
-            server.log("We have msg in buffer 0");
+            // server.log("We have msg in buffer 0");
             // get message, clear interrupt flag
             msg = _readMsgFromBuffer(MCP2515_RX_BUFF_0_CTRL_REG);
             _modifyReg(MCP2515_CAN_INT_FLAG_REG, 0x01, 0x00);
         } else if (status & 0x02) {
-            server.log("We have msg in buffer 1");
+            // server.log("We have msg in buffer 1");
             // get message, clear interrupt flag
             msg = _readMsgFromBuffer(MCP2515_RX_BUFF_1_CTRL_REG);
             _modifyReg(MCP2515_CAN_INT_FLAG_REG, 0x02, 0x00);
         } else {
-            server.log("No msg found.");
+            // server.log("No msg found.");
         }
 
         return msg;
@@ -415,19 +415,20 @@ class MCP2515 {
 
     function getError() {
         local res = _getReg(MCP2515_ERROR_FLAG_REG);
+        local errors = {};
         if (typeof res == "blob" && res.len() == 1) {
             local errorFlagReg = res[0];
-            // server.log(errorFlagReg);
-            if (errorFlagReg == 0) server.log("No errors found");
-            if (errorFlagReg & 0x01) server.log("RX Buffer 1 overflow");
-            if (errorFlagReg & 0x02) server.log("RX Buffer 0 overflow");
-            if (errorFlagReg & 0x04) server.log("TX Bus off");
-            if (errorFlagReg & 0x08) server.log("TX Error Passive");
-            if (errorFlagReg & 0x10) server.log("RX Error Passive");
-            if (errorFlagReg & 0x20) server.log("TX Error Warning");
-            if (errorFlagReg & 0x40) server.log("RX Error Warning");
-            if (errorFlagReg & 0x80) server.log("TX or RX Error Warning");
+            errors.errorFound <- (errorFlagReg != 0);                 // server.log("Errors found");
+            errors.rxB1Overflow <- (errorFlagReg & 0x01);       // server.log("RX Buffer 1 overflow");
+            errors.rxB0Overflow <- (errorFlagReg & 0x02);       // server.log("RX Buffer 0 overflow");
+            errors.txBusOff <- (errorFlagReg & 0x04);           // server.log("TX Bus off");
+            errors.txErrorPassive <- (errorFlagReg & 0x08);     // server.log("TX Error Passive");
+            errors.rxErrorPassive <- (errorFlagReg & 0x10);     // server.log("RX Error Passive");
+            errors.txErrorWarning <- (errorFlagReg & 0x20);     // server.log("TX Error Warning");
+            errors.rxErrorWarning <- (errorFlagReg & 0x40);     // server.log("RX Error Warning");
+            errors.txRxErrorWarning <- (errorFlagReg & 0x80);   // server.log("TX or RX Error Warning");
         }
+        return errors;
     }
 
     function _configureMasksAndFilters(startingAddr, ext, id) {
@@ -476,8 +477,8 @@ class MCP2515 {
 
     function _readMsgFromBuffer(buffCtrlAddr) {
         local res = _getReg(buffCtrlAddr, 6);
-        server.log("Get readMsg response: ");
-        server.log(res);
+        // server.log("Get readMsg response: ");
+        // server.log(res);
         // [0] - CTRL, [1] - StandId high, [2] - StandId low
         // [3] - ExtId high, [4] - ExtId low, [5] - Data len
 
@@ -512,7 +513,7 @@ class MCP2515 {
 
         // Read data out of buffer
         local data = _getReg(buffCtrlAddr + 6, dataLen);
-        return {"extended" : ext, "rtr" : rtr, "rtrReceived" : rtrReceived, "id" : id, "msg" : data};
+        return {"extended" : ext, "rtr" : rtr, "rtrReceived" : rtrReceived, "id" : id, "data" : data};
     }
 
     function _writeReg(addr, val) {
