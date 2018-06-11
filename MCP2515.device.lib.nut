@@ -349,8 +349,7 @@ class MCP2515 {
     }
 
     // NOTE: Mask 0 - is mask for buffer 0, mask 1 is mask for buffer 1
-    function configureMask(maskNum, id) {
-        local ext = (id.len() > 11);
+    function configureMask(maskNum, ext, id) {
         switch (maskNum) {
             case 0:
                 _configureMasksAndFilters(MCP2515_RX_MASK_0_STAND_ID_HIGH, ext, id);

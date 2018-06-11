@@ -1,12 +1,16 @@
 # MCP2515 #
 
-Driver for MCP2515, a stand-alone CAN controller with SPI interface. [MCP2515 Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/20001801H.pdf)
+Driver for MCP2515, a stand-alone CAN controller with SPI interface. The MCP2515 is capable of transmitting and receiving both standard and extended data and remote frames. It has three transmit buffers with prioritization and abort features and two receive buffers. To filter out unwanted messages the MCP2515 has two acceptance masks and six acceptance filters. [MCP2515 Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/20001801H.pdf).
+
+**Note** This driver class is still under development, so some features of the MCP2515 are not implemented yet.
+
+To use this driver copy and paste the MCP2515.device.lib.nut file into your device code.
 
 ## Class Usage ##
 
 ### constructor(*spiBus[, chipSelectPin]*) ###
 
-The class’ constructor takes one required parameter (a configured imp SPI bus) and an optional parameter (the chip select pin). The chip select pin will be configured by the constructor. If no chip select pin is provided the Imp API *spi.chipselect* method will be used to drive the chip select pin (NOTE: This method is only available on imps with a dedicated chip select pin and can only be used when the SPI bus is configured with **USE_CS_L** mode flag)
+The class’ constructor takes one required parameter (a configured imp SPI bus) and an optional parameter (the chip select pin). The chip select pin will be configured by the constructor. If no chip select pin is provided the Imp API *spi.chipselect* method will be used to drive the chip select pin (NOTE: This method is only available on imps with a dedicated chip select pin and can only be used when the SPI bus is configured with **USE_CS_L** mode flag).
 
 #### Parameters ####
 
@@ -164,6 +168,12 @@ canBus.configureInterrupts(MCP2515_EN_INT_RXB0 | MCP2515_EN_INT_RXB1);
 
 This method configures RX0BF and RX1BF pins. See configuration settings below. To configure both pins constants can be *or-ed*.
 
+#### Parameters ####
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| *settings* | constant(s) | N/A | Use the *RX Buffer Pin Constants* below to select the desired pin configuration settings. With the exeption of MCP2515_RXBF_PINS_DISABLE, constants can be *or-ed*. |
+
 #### RX Buffer Pin Settings ####
 
 | RX Buffer Pin Constants | Description |
@@ -191,6 +201,12 @@ canBus.configureRxBuffPins(MCP2515_RX0BF_PIN_EN_DIG_OUT_HIGH | MCP2515_RX1BF_PIN
 
 This method configures TX0RTS, TX1RTS and TX2RTS pins. See configuration settings below. To configure multiple RTS pins constants can be *or-ed*.
 
+#### Parameters ####
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| *settings* | constant(s) | N/A | Use the *TX RTS Pin Settings* below to select the desired pin configuration settings. RTS pin constants can be *or-ed*. |
+
 #### TX RTS Pin Settings ####
 
 | TX RTS Pin Constants | Description |
@@ -209,17 +225,103 @@ Nothing.
 ```
 // Enable TXRTS pins as digial inputs
 canBus.configureRxBuffPins(MCP2515_TXRTS_PINS_DIG_IN);
+
+
+// Enable TX0RTS and TX1RTS to request to send mode, and TX2RTS as a digital input.
+canBus.configureRxBuffPins(MCP2515_TX0RTS_PIN_RTS | MCP2515_TX1RTS_PIN_RTS);
+```
+
+### configureFilter(*filterNum, ext, idFilter*)
+
+This method configures filters to be applied to incoming messages.
+
+#### Parameters ####
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| *filterNum* | integer | N/A | Accepted values: 0-5. Filters 0-1 will effect messages loaded into RX Buffer 0. Filters 2-5 effect messages loaded into RX Buffer 1. |
+| *ext*       | boolean | N/A | If `true` the id filter will be applied to incoming extended messages, if `false` filter will be applied to incoming standard messages. |
+| *idFilter*  | integer | N/A | Incoming messages with id's that match the *idFilter* will be loaded into the receive buffer. |
+
+#### Return Value ####
+
+Nothing.
+
+#### Example ####
+
+```
+// Configure RX buffer 0 filters to only accept messages with standard ids of 5 and 10.
+canBus.configureFilter(0, false, 5);
+canBus.configureFilter(1, false, 10);
+```
+
+### configureMask(*maskNum, ext, idMask*)
+
+This method configures the masks used to filter incoming messages. The length of the *idMask* parameter will determine if the mask is applied to standard or extended messages.
+
+#### Parameters ####
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| *maskNum* | integer | N/A | Accepted values: 0-1. Mask 0 will effect messages loaded into RX Buffer 0. Mask 1 will effect messages loaded into RX Buffer 1. |
+| *ext*     | boolean | N/A | If `true` the id mask will be applied to incoming extended messages, if `false` mask will be applied to incoming standard messages. |
+| *idMask*  | integer | N/A | If id mask bit is set to `1` messages will only be loaded into the RX buffer if they match the filters for that buffer. If id mask bit is set to `0` filters for that bit will be bypassed. |
+
+#### Return Value ####
+
+Nothing.
+
+#### Example ####
+
+```
+// Configure standard message mask for RX buffer 0.
+canBus.configureFilter(0, false, 0x0F);
+// Configure extended message mask for RX buffer 1.
+canBus.configureFilter(1, true, 0x1F000000);
+```
+
+### enableMasksAndFilters(*enable*)
+
+This method enables or disables message filtering based on the mask and filters set with *configureMask()* and *configureFilter()* methods.
+
+#### Parameters ####
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| *enable* | boolean | N/A | If `true` enables, if set to `false` disables message filtering. |
+
+#### Return Value ####
+
+Nothing.
+
+#### Example ####
+
+```
+// Enable message filtering
+canBus.enableMasksAndFilters(true);
+
+// Disable message filtering
+canBus.enableMasksAndFilters(false);
 ```
 
 ### clearFiltersAndMasks()
 
-### enableMasksAndFilters(*enable*)
+This method sets all masks and filters to default state - all mask and filter ids set to zero.
 
-### configureMask(*maskNum, idMask*)
+#### Return Value ####
 
-### configureFilter(*filterNum, ext, idFilter*)
+Nothing.
+
+#### Example ####
+
+```
+// Enable interrupts on all received messages
+canBus.clearFiltersAndMasks();
+```
 
 ### readMsg()
+
+
 
 ### getError()
 
