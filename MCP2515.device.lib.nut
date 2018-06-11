@@ -216,6 +216,8 @@ const MCP2515_TX2RTS_PIN_RTS    = 0x04;
 
 class MCP2515 {
 
+    static VERSION = "0.1.0";
+
     _spi = null;
     _cs  = null;
 

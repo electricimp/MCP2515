@@ -4,7 +4,7 @@ Driver for MCP2515, a stand-alone CAN controller with SPI interface. The MCP2515
 
 **Note** This driver class is still under development, so some features of the MCP2515 are not implemented yet.
 
-To use this driver copy and paste the MCP2515.device.lib.nut file into your device code.
+**To use this driver copy and paste the** `MCP2515.device.lib.nut` **file into your device code.**
 
 ## Class Usage ##
 
@@ -383,48 +383,48 @@ if (errors.errorFound) {
 ### Timing Suggestions ###
 
 | Clock Rate | Bus Speed | Baud Rate Prescaler | Propagation Segment | Phase Segment 1 | Phase Segment 2 | Synchonization Jump Width |
-| --- | --- | --- | --- | --- | --- | --- |
-| 8mHz | 1000kBPS |  |  |  |  |  |
-| 8mHz | 500kBPS |  |  |  |  |  |
-| 8mHz | 250kBPS |  |  |  |  |  |
-| 8mHz | 200kBPS |  |  |  |  |  |
-| 8mHz | 125kBPS |  |  |  |  |  |
-| 8mHz | 100kBPS |  |  |  |  |  |
-| 8mHz | 80kBPS |  |  |  |  |  |
-| 8mHz | 50kBPS |  |  |  |  |  |
-| 8mHz | 40kBPS |  |  |  |  |  |
-| 8mHz | 33k3BPS |  |  |  |  |  |
-| 8mHz | 31k25BPS |  |  |  |  |  |
-| 8mHz | 20kBPS |  |  |  |  |  |
-| 8mHz | 10kBPS |  |  |  |  |  |
-| 8mHz | 5kBPS |  |  |  |  |  |
-| 10mHz | 1000kBPS | 1 | 1 | 1 | 2 | 1 |
-| 10mHz | 500kBPS | 1 | 2 | 4 | 3 | 1 |
-| 10mHz | 250kBPS | 1 | 7 | 7 | 5 | 2 |
-| 10mHz | 125kBPS | 2 | 7 | 7 | 5 | 2 |
-| 10mHz | 100kBPS | 5 | 4 | 3 | 2 | 2 |
-| 10mHz | 50kBPS | 5 | 7 | 7 | 5 | 2 |
-| 10mHz | 40kBPS | 5 | 8 | 8 | 8 | 4 |
-| 10mHz | 20kBPS | 25 | 4 | 3 | 2 | 1 |
-| 16mHz | 1000kBPS |  |  |  |  |  |
-| 16mHz | 500kBPS |  |  |  |  |  |
-| 16mHz | 250kBPS |  |  |  |  |  |
-| 16mHz | 200kBPS |  |  |  |  |  |
-| 16mHz | 125kBPS |  |  |  |  |  |
-| 16mHz | 100kBPS |  |  |  |  |  |
-| 16mHz | 80kBPS |  |  |  |  |  |
-| 16mHz | 50kBPS |  |  |  |  |  |
-| 16mHz | 40kBPS |  |  |  |  |  |
-| 16mHz | 33k3BPS |  |  |  |  |  |
-| 16mHz | 20kBPS |  |  |  |  |  |
-| 16mHz | 10kBPS |  |  |  |  |  |
-| 16mHz | 5kBPS |  |  |  |  |  |
-| 20mHz | 1000kBPS | 1 | 2 | 4 | 3 | 1 |
-| 20mHz | 500kBPS | 1 | 7 | 7 | 5 | 2 |
-| 20mHz | 250kBPS | 2 | 7 | 7 | 5 | 2 |
-| 20mHz | 200kBPS | 5 | 4 | 3 | 2 | 2 |
-| 20mHz | 125kBPS | 5 | 6 | 5 | 4 | 2 |
-| 20mHz | 100kBPS | 5 | 7 | 7 | 5 | 2 |
-| 20mHz | 80kBPS | 5 | 8 | 8 | 8 | 4 |
-| 20mHz | 50kBPS | 10 | 7 | 7 | 5 | 2 |
-| 20mHz | 40kBPS | 25 | 4 | 3 | 2 | 1 |
+| ---------- | --------- | ------------------- | ------------------- | --------------- | --------------- | ------------------------- |
+| 8mHz       | 1000kBPS  | 1                   | 1                   | 1               | 1               | 1                         |
+| 8mHz       | 500kBPS   | 1                   | 2                   | 3               | 2               | 1                         |
+| 8mHz       | 250kBPS   | 1                   | 6                   | 5               | 4               | 3                         |
+| 8mHz       | 200kBPS   | 1                   | 7                   | 7               | 5               | 3                         |
+| 8mHz       | 125kBPS   | 2                   | 6                   | 5               | 4               | 3                         |
+| 8mHz       | 100kBPS   | 2                   | 7                   | 7               | 5               | 3                         |
+| 8mHz       | 80kBPS    | 5                   | 4                   | 3               | 2               | 3                         |
+| 8mHz       | 50kBPS    | 5                   | 6                   | 5               | 4               | 3                         |
+| 8mHz       | 40kBPS    | 5                   | 7                   | 7               | 5               | 3                         |
+| 8mHz       | 33k3BPS   | 6                   | 7                   | 7               | 5               | 3                         |
+| 8mHz       | 31k25BPS  | 8                   | 6                   | 5               | 4               | 3                         |
+| 8mHz       | 20kBPS    | 10                  | 7                   | 7               | 5               | 3                         |
+| 8mHz       | 10kBPS    | 19                  | 7                   | 7               | 5               | 3                         |
+| 8mHz       | 5kBPS     | 39                  | 7                   | 7               | 5               | 3                         |
+| 10mHz      | 1000kBPS  | 1                   | 1                   | 1               | 2               | 1                         |
+| 10mHz      | 500kBPS   | 1                   | 2                   | 4               | 3               | 1                         |
+| 10mHz      | 250kBPS   | 1                   | 7                   | 7               | 5               | 2                         |
+| 10mHz      | 125kBPS   | 2                   | 7                   | 7               | 5               | 2                         |
+| 10mHz      | 100kBPS   | 5                   | 4                   | 3               | 2               | 2                         |
+| 10mHz      | 50kBPS    | 5                   | 7                   | 7               | 5               | 2                         |
+| 10mHz      | 40kBPS    | 5                   | 8                   | 8               | 8               | 4                         |
+| 10mHz      | 20kBPS    | 25                  | 4                   | 3               | 2               | 1                         |
+| 16mHz      | 1000kBPS  | 1                   | 3                   | 2               | 2               | 1                         |
+| 16mHz      | 500kBPS   | 1                   | 6                   | 5               | 4               | 2                         |
+| 16mHz      | 250kBPS   | 2                   | 6                   | 5               | 4               | 2                         |
+| 16mHz      | 200kBPS   | 2                   | 7                   | 7               | 5               | 2                         |
+| 16mHz      | 125kBPS   | 4                   | 6                   | 5               | 4               | 2                         |
+| 16mHz      | 100kBPS   | 5                   | 6                   | 5               | 4               | 2                         |
+| 16mHz      | 80kBPS    | 5                   | 7                   | 7               | 5               | 2                         |
+| 16mHz      | 50kBPS    | 8                   | 7                   | 7               | 5               | 2                         |
+| 16mHz      | 40kBPS    | 10                  | 7                   | 7               | 5               | 2                         |
+| 16mHz      | 33k3BPS   | 15                  | 6                   | 5               | 4               | 2                         |
+| 16mHz      | 20kBPS    | 19                  | 7                   | 7               | 5               | 2                         |
+| 16mHz      | 10kBPS    | 39                  | 7                   | 7               | 5               | 2                         |
+| 16mHz      | 5kBPS     | 63                  | 8                   | 8               | 8               | 1                         |
+| 20mHz      | 1000kBPS  | 1                   | 2                   | 4               | 3               | 1                         |
+| 20mHz      | 500kBPS   | 1                   | 7                   | 7               | 5               | 2                         |
+| 20mHz      | 250kBPS   | 2                   | 7                   | 7               | 5               | 2                         |
+| 20mHz      | 200kBPS   | 5                   | 4                   | 3               | 2               | 2                         |
+| 20mHz      | 125kBPS   | 5                   | 6                   | 5               | 4               | 2                         |
+| 20mHz      | 100kBPS   | 5                   | 7                   | 7               | 5               | 2                         |
+| 20mHz      | 80kBPS    | 5                   | 8                   | 8               | 8               | 4                         |
+| 20mHz      | 50kBPS    | 10                  | 7                   | 7               | 5               | 2                         |
+| 20mHz      | 40kBPS    | 25                  | 4                   | 3               | 2               | 1                         |
