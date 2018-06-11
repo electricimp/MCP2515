@@ -2,7 +2,7 @@
 
 Driver for MCP2515, a stand-alone CAN controller with SPI interface. The MCP2515 is capable of transmitting and receiving both standard and extended data and remote frames. It has three transmit buffers with prioritization and abort features and two receive buffers. To filter out unwanted messages the MCP2515 has two acceptance masks and six acceptance filters. [MCP2515 Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/20001801H.pdf).
 
-**Note** This driver class is still under development, so some features of the MCP2515 are not implemented yet.
+**Note** This driver class is still under development, so some features of the MCP2515 are not implemented yet. Currently only message receive is implemented, and only standard Ids have been tested.
 
 **To use this driver copy and paste the** `MCP2515.device.lib.nut` **file into your device code.**
 
