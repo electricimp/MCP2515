@@ -418,7 +418,7 @@ class MCP2515 {
         local errors = {};
         if (typeof res == "blob" && res.len() == 1) {
             local errorFlagReg = res[0];
-            errors.errorFound <- (errorFlagReg != 0);                 // server.log("Errors found");
+            errors.errorFound <- (errorFlagReg != 0);           // server.log("Errors found");
             errors.rxB1Overflow <- (errorFlagReg & 0x01);       // server.log("RX Buffer 1 overflow");
             errors.rxB0Overflow <- (errorFlagReg & 0x02);       // server.log("RX Buffer 0 overflow");
             errors.txBusOff <- (errorFlagReg & 0x04);           // server.log("TX Bus off");
