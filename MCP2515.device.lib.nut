@@ -181,7 +181,7 @@ const MCP2515_OP_MODE_POWERUP     = 0xE0;
 const MCP2515_INIT_DEFAULT_BRP         = 1;
 const MCP2515_INIT_DEFAULT_PROP_SEG    = 1;
 const MCP2515_INIT_DEFAULT_PHASE_SEG_1 = 1;
-const MCP2515_INIT_DEFAULT_PHASE_SEG_2 = 1;
+const MCP2515_INIT_DEFAULT_PHASE_SEG_2 = 2;
 const MCP2515_INIT_DEFAULT_SJW         = 1;
 
 // Settings
@@ -341,13 +341,21 @@ class MCP2515 {
     }
 
     function enableMasksAndFilters(enable) {
+        // server.log("In enable masks and filters. Enable: " + enable);
+        // server.log(format("Updating register: 0x%02X", MCP2515_RX_BUFF_0_CTRL_REG))
+        // server.log(format("Updating register: 0x%02X", MCP2515_RX_BUFF_1_CTRL_REG))
         if (enable) {
-            _modifyReg(MCP2515_RX_BUFF_0_CTRL_REG, 0x64, 0x00);
-            _modifyReg(MCP2515_RX_BUFF_1_CTRL_REG, 0x60, 0x00);
-        } else {
             _modifyReg(MCP2515_RX_BUFF_0_CTRL_REG, 0x64, 0x60);
             _modifyReg(MCP2515_RX_BUFF_1_CTRL_REG, 0x60, 0x60);
+        } else {
+            _modifyReg(MCP2515_RX_BUFF_0_CTRL_REG, 0x64, 0x00);
+            _modifyReg(MCP2515_RX_BUFF_1_CTRL_REG, 0x60, 0x00);
         }
+
+        // local res = _getReg(MCP2515_RX_BUFF_0_CTRL_REG)[0]
+        // server.log(format("Register 0x%02X value: 0x%02X", MCP2515_RX_BUFF_0_CTRL_REG, res));
+        // res = _getReg(MCP2515_RX_BUFF_1_CTRL_REG)[0]
+        // server.log(format("Register 0x%02X value: 0x%02X", MCP2515_RX_BUFF_1_CTRL_REG, res));
     }
 
     // NOTE: Mask 0 - is mask for buffer 0, mask 1 is mask for buffer 1
@@ -395,7 +403,7 @@ class MCP2515 {
     function readMsg() {
         // Check for msgs in buffer 0 and 1
         local status = _readStatus();
-        // server.log(format("0x%02X", status));
+        // server.log(format("Status result: 0x%02X", status));
 
         local msg = null;
         if (status & 0x01) {
@@ -421,19 +429,20 @@ class MCP2515 {
         if (typeof res == "blob" && res.len() == 1) {
             local errorFlagReg = res[0];
             errors.errorFound <- (errorFlagReg != 0);           // server.log("Errors found");
-            errors.rxB1Overflow <- (errorFlagReg & 0x01);       // server.log("RX Buffer 1 overflow");
-            errors.rxB0Overflow <- (errorFlagReg & 0x02);       // server.log("RX Buffer 0 overflow");
-            errors.txBusOff <- (errorFlagReg & 0x04);           // server.log("TX Bus off");
-            errors.txErrorPassive <- (errorFlagReg & 0x08);     // server.log("TX Error Passive");
-            errors.rxErrorPassive <- (errorFlagReg & 0x10);     // server.log("RX Error Passive");
-            errors.txErrorWarning <- (errorFlagReg & 0x20);     // server.log("TX Error Warning");
-            errors.rxErrorWarning <- (errorFlagReg & 0x40);     // server.log("RX Error Warning");
-            errors.txRxErrorWarning <- (errorFlagReg & 0x80);   // server.log("TX or RX Error Warning");
+            errors.rxB1Overflow <- (errorFlagReg & 0x01) == 0x01;       // server.log("RX Buffer 1 overflow");
+            errors.rxB0Overflow <- (errorFlagReg & 0x02) == 0x02;       // server.log("RX Buffer 0 overflow");
+            errors.txBusOff <- (errorFlagReg & 0x04)  == 0x04;           // server.log("TX Bus off");
+            errors.txErrorPassive <- (errorFlagReg & 0x08) == 0x08;     // server.log("TX Error Passive");
+            errors.rxErrorPassive <- (errorFlagReg & 0x10) == 0x10;     // server.log("RX Error Passive");
+            errors.txErrorWarning <- (errorFlagReg & 0x20) == 0x20;     // server.log("TX Error Warning");
+            errors.rxErrorWarning <- (errorFlagReg & 0x40) == 0x40;     // server.log("RX Error Warning");
+            errors.txRxErrorWarning <- (errorFlagReg & 0x80) == 0x80;   // server.log("TX or RX Error Warning");
         }
         return errors;
     }
 
     function _configureMasksAndFilters(startingAddr, ext, id) {
+        // server.log("In configure masks and filters");
         local data = blob(4);
         // 0 = Standard High reg data (bits 3-10 of standard id)
         // 1 = Standard Low reg data (bits 0-2 of standard id, ext filter enable, and bits 16-17 ext id)
@@ -458,7 +467,7 @@ class MCP2515 {
         // Mid bits of Extended id (grab bits 8-15 of id)
         data[2] = (id & 0x7F80000) >> 19;
         // Lower bits of Extended id (grab bits 0-7 of id)
-        data[3] = id & 0x7F800 >> 11;
+        data[3] = (id & 0x7F800) >> 11;
 
         // If ext filter enabled write 1 to reg bit 3
         local extEn = (ext) ? 1 : 0;
@@ -470,8 +479,15 @@ class MCP2515 {
         local mode = _getReg(MCP2515_CAN_STATUS_REG)[0] & MCP2515_OP_MODE_MASK;
         local res = setOpMode(MCP2515_OP_MODE_CONFIG);
 
+        // server.log(format("Writing data to registers starting at addr: 0x%02X", startingAddr));
+        // server.log(data);
+
         // Update register
         res = _writeReg(startingAddr, data);
+
+        // res = _getReg(startingAddr, 4);
+        // server.log(format("Data in registers starting at addr: 0x%02X", startingAddr))
+        // server.log(res);
 
         // Set back to non-config mode
         res = setOpMode(mode);
@@ -479,7 +495,7 @@ class MCP2515 {
 
     function _readMsgFromBuffer(buffCtrlAddr) {
         local res = _getReg(buffCtrlAddr, 6);
-        // server.log("Get readMsg response: ");
+        // server.log(format("Get readMsg data from registers starting at addr: 0x%02X", buffCtrlAddr));
         // server.log(res);
         // [0] - CTRL, [1] - StandId high, [2] - StandId low
         // [3] - ExtId high, [4] - ExtId low, [5] - Data len
@@ -496,21 +512,21 @@ class MCP2515 {
         //        (6) extended frame remote=1,
 
         local rtr;
-        local ext = (res[2] & 0x08) == 1;
+        local ext = (res[2] & 0x08) == 0x08;
         local dataLen = res[5] & 0x0F;
         // Grab the Standard ID
         local id = res[1] << 3 | (res[2] & 0xE0) >> 5
         // Remote transfer request received
-        local rtrReceived = (res[0] & 0x08) == 1;
+        local rtrReceived = (res[0] & 0x08) == 0x08;
         if (ext) {
             // We have an extended frame msg
             // Remote transmit requested
-            rtr = (res[5] & 0x40) == 1;
+            rtr = (res[5] & 0x40) == 0x40;
             // Update msg ID to include extended ID
             id = (res[2] & 0x03) << 27 | res[3] << 19 | res[4] << 11 | id;
         } else {
             // We have a standard frame msg, check remote transmit request
-            rtr = (res[2] & 0x10) == 1;
+            rtr = (res[2] & 0x10) == 0x10;
         }
 
         // Read data out of buffer
@@ -585,4 +601,3 @@ class MCP2515 {
         return b;
     }
 }
-
