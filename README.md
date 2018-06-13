@@ -274,7 +274,7 @@ canBus.clearFiltersAndMasks();
 
 This method configures the masks used to filter incoming messages.
 
-**Note:** The init method configures masks to all `0`, bypass filter.
+**Note:** The init method configures mask registers to all `0`, bypass filter. All messages will be accepted until masks have been configured.
 
 #### Parameters ####
 
@@ -302,7 +302,7 @@ canBus.enableMasksAndFilters(true);
 
 This method configures filters to be applied to incoming messages.
 
-**Note:** The init method configures masks to all `0`, bypass filter. For filters to take effect mask bits must be configured.
+**Note:** The init method configures mask registers to all `0`, bypass filter. For filters to take effect masks must be configured.
 
 #### Parameters ####
 
@@ -431,11 +431,11 @@ There are four rules that must be adhered to when programming the timing segment
 | 8mHz       | 200kb/s   | 1                   | 7                   | 7               | 5               | 3                         |
 | 8mHz       | 125kb/s   | 2                   | 6                   | 5               | 4               | 3                         |
 | 8mHz       | 100kb/s   | 2                   | 7                   | 7               | 5               | 3                         |
-| 8mHz       | 80kb/s    | 5                   | 4                   | 3               | 2               | 3                         |
+| 8mHz       | 80kb/s    | 5                   | 4                   | 3               | 2               | 1                         |
 | 8mHz       | 50kb/s    | 5                   | 6                   | 5               | 4               | 3                         |
 | 8mHz       | 40kb/s    | 5                   | 7                   | 7               | 5               | 3                         |
-| 8mHz       | 33.3kb/s   | 6                   | 7                   | 7               | 5               | 3                         |
-| 8mHz       | 31.25kb/s  | 8                   | 6                   | 5               | 4               | 3                         |
+| 8mHz       | 33.3kb/s  | 6                   | 7                   | 7               | 5               | 3                         |
+| 8mHz       | 31.25kb/s | 8                   | 6                   | 5               | 4               | 3                         |
 | 8mHz       | 20kb/s    | 10                  | 7                   | 7               | 5               | 3                         |
 | 8mHz       | 10kb/s    | 19                  | 7                   | 7               | 5               | 3                         |
 | 8mHz       | 5kb/s     | 39                  | 7                   | 7               | 5               | 3                         |
@@ -443,7 +443,7 @@ There are four rules that must be adhered to when programming the timing segment
 | 10mHz      | 500kb/s   | 1                   | 2                   | 4               | 3               | 1                         |
 | 10mHz      | 250kb/s   | 1                   | 7                   | 7               | 5               | 2                         |
 | 10mHz      | 125kb/s   | 2                   | 7                   | 7               | 5               | 2                         |
-| 10mHz      | 100kb/s   | 5                   | 4                   | 3               | 2               | 2                         |
+| 10mHz      | 100kb/s   | 5                   | 4                   | 3               | 2               | 1                         |
 | 10mHz      | 50kb/s    | 5                   | 7                   | 7               | 5               | 2                         |
 | 10mHz      | 40kb/s    | 5                   | 8                   | 8               | 8               | 4                         |
 | 10mHz      | 20kb/s    | 25                  | 4                   | 3               | 2               | 1                         |
@@ -456,14 +456,14 @@ There are four rules that must be adhered to when programming the timing segment
 | 16mHz      | 80kb/s    | 5                   | 7                   | 7               | 5               | 2                         |
 | 16mHz      | 50kb/s    | 8                   | 7                   | 7               | 5               | 2                         |
 | 16mHz      | 40kb/s    | 10                  | 7                   | 7               | 5               | 2                         |
-| 16mHz      | 33.3kb/s   | 15                  | 6                   | 5               | 4               | 2                         |
+| 16mHz      | 33.3kb/s  | 15                  | 6                   | 5               | 4               | 2                         |
 | 16mHz      | 20kb/s    | 19                  | 7                   | 7               | 5               | 2                         |
 | 16mHz      | 10kb/s    | 39                  | 7                   | 7               | 5               | 2                         |
 | 16mHz      | 5kb/s     | 63                  | 8                   | 8               | 8               | 1                         |
 | 20mHz      | 1000kb/s  | 1                   | 2                   | 4               | 3               | 1                         |
 | 20mHz      | 500kb/s   | 1                   | 7                   | 7               | 5               | 2                         |
 | 20mHz      | 250kb/s   | 2                   | 7                   | 7               | 5               | 2                         |
-| 20mHz      | 200kb/s   | 5                   | 4                   | 3               | 2               | 2                         |
+| 20mHz      | 200kb/s   | 5                   | 4                   | 3               | 2               | 1                         |
 | 20mHz      | 125kb/s   | 5                   | 6                   | 5               | 4               | 2                         |
 | 20mHz      | 100kb/s   | 5                   | 7                   | 7               | 5               | 2                         |
 | 20mHz      | 80kb/s    | 5                   | 8                   | 8               | 8               | 4                         |
