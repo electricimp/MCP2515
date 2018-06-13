@@ -345,11 +345,11 @@ class MCP2515 {
         // server.log(format("Updating register: 0x%02X", MCP2515_RX_BUFF_0_CTRL_REG))
         // server.log(format("Updating register: 0x%02X", MCP2515_RX_BUFF_1_CTRL_REG))
         if (enable) {
-            _modifyReg(MCP2515_RX_BUFF_0_CTRL_REG, 0x64, 0x60);
-            _modifyReg(MCP2515_RX_BUFF_1_CTRL_REG, 0x60, 0x60);
-        } else {
-            _modifyReg(MCP2515_RX_BUFF_0_CTRL_REG, 0x64, 0x00);
+            _modifyReg(MCP2515_RX_BUFF_0_CTRL_REG, 0x64, 0x00); // don't mask off buffer rollover bit
             _modifyReg(MCP2515_RX_BUFF_1_CTRL_REG, 0x60, 0x00);
+        } else {
+            _modifyReg(MCP2515_RX_BUFF_0_CTRL_REG, 0x64, 0x60); // don't mask off buffer rollover bit
+            _modifyReg(MCP2515_RX_BUFF_1_CTRL_REG, 0x60, 0x60);
         }
 
         // local res = _getReg(MCP2515_RX_BUFF_0_CTRL_REG)[0]
@@ -359,13 +359,13 @@ class MCP2515 {
     }
 
     // NOTE: Mask 0 - is mask for buffer 0, mask 1 is mask for buffer 1
-    function configureMask(maskNum, ext, id) {
+    function configureMask(maskNum, id) {
         switch (maskNum) {
             case 0:
-                _configureMasksAndFilters(MCP2515_RX_MASK_0_STAND_ID_HIGH, ext, id);
+                _configureMasksAndFilters(MCP2515_RX_MASK_0_STAND_ID_HIGH, id);
                 break;
             case 1:
-                _configureMasksAndFilters(MCP2515_RX_MASK_1_STAND_ID_HIGH, ext, id);
+                _configureMasksAndFilters(MCP2515_RX_MASK_1_STAND_ID_HIGH, id);
                 break;
             default:
                 // Invalid mask number
@@ -377,22 +377,22 @@ class MCP2515 {
     function configureFilter(filterNum, ext, id) {
         switch (filterNum) {
             case 0:
-                _configureMasksAndFilters(MCP2515_RX_FILTER_0_STAND_ID_HIGH, ext, id);
+                _configureMasksAndFilters(MCP2515_RX_FILTER_0_STAND_ID_HIGH, id, ext);
                 break;
             case 1:
-                _configureMasksAndFilters(MCP2515_RX_FILTER_1_STAND_ID_HIGH, ext, id);
+                _configureMasksAndFilters(MCP2515_RX_FILTER_1_STAND_ID_HIGH, id, ext);
                 break;
             case 2:
-                _configureMasksAndFilters(MCP2515_RX_FILTER_2_STAND_ID_HIGH, ext, id);
+                _configureMasksAndFilters(MCP2515_RX_FILTER_2_STAND_ID_HIGH, id, ext);
                 break;
             case 3:
-                _configureMasksAndFilters(MCP2515_RX_FILTER_3_STAND_ID_HIGH, ext, id);
+                _configureMasksAndFilters(MCP2515_RX_FILTER_3_STAND_ID_HIGH, id, ext);
                 break;
             case 4:
-                _configureMasksAndFilters(MCP2515_RX_FILTER_4_STAND_ID_HIGH, ext, id);
+                _configureMasksAndFilters(MCP2515_RX_FILTER_4_STAND_ID_HIGH, id, ext);
                 break;
             case 5:
-                _configureMasksAndFilters(MCP2515_RX_FILTER_5_STAND_ID_HIGH, ext, id);
+                _configureMasksAndFilters(MCP2515_RX_FILTER_5_STAND_ID_HIGH, id, ext);
                 break;
             default:
                 // Invalid filter number
@@ -428,20 +428,20 @@ class MCP2515 {
         local errors = {};
         if (typeof res == "blob" && res.len() == 1) {
             local errorFlagReg = res[0];
-            errors.errorFound <- (errorFlagReg != 0);           // server.log("Errors found");
-            errors.rxB1Overflow <- (errorFlagReg & 0x01) == 0x01;       // server.log("RX Buffer 1 overflow");
-            errors.rxB0Overflow <- (errorFlagReg & 0x02) == 0x02;       // server.log("RX Buffer 0 overflow");
-            errors.txBusOff <- (errorFlagReg & 0x04)  == 0x04;           // server.log("TX Bus off");
-            errors.txErrorPassive <- (errorFlagReg & 0x08) == 0x08;     // server.log("TX Error Passive");
-            errors.rxErrorPassive <- (errorFlagReg & 0x10) == 0x10;     // server.log("RX Error Passive");
-            errors.txErrorWarning <- (errorFlagReg & 0x20) == 0x20;     // server.log("TX Error Warning");
-            errors.rxErrorWarning <- (errorFlagReg & 0x40) == 0x40;     // server.log("RX Error Warning");
-            errors.txRxErrorWarning <- (errorFlagReg & 0x80) == 0x80;   // server.log("TX or RX Error Warning");
+            errors.errorFound       <- (errorFlagReg != 0);           // server.log("Errors found");
+            errors.rxB1Overflow     <- (errorFlagReg & 0x01) == 0x01; // server.log("RX Buffer 1 overflow");
+            errors.rxB0Overflow     <- (errorFlagReg & 0x02) == 0x02; // server.log("RX Buffer 0 overflow");
+            errors.txBusOff         <- (errorFlagReg & 0x04) == 0x04; // server.log("TX Bus off");
+            errors.txErrorPassive   <- (errorFlagReg & 0x08) == 0x08; // server.log("TX Error Passive");
+            errors.rxErrorPassive   <- (errorFlagReg & 0x10) == 0x10; // server.log("RX Error Passive");
+            errors.txErrorWarning   <- (errorFlagReg & 0x20) == 0x20; // server.log("TX Error Warning");
+            errors.rxErrorWarning   <- (errorFlagReg & 0x40) == 0x40; // server.log("RX Error Warning");
+            errors.txRxErrorWarning <- (errorFlagReg & 0x80) == 0x80; // server.log("TX or RX Error Warning");
         }
         return errors;
     }
 
-    function _configureMasksAndFilters(startingAddr, ext, id) {
+    function _configureMasksAndFilters(startingAddr, id, ext = false) {
         // server.log("In configure masks and filters");
         local data = blob(4);
         // 0 = Standard High reg data (bits 3-10 of standard id)
@@ -470,10 +470,11 @@ class MCP2515 {
         data[3] = (id & 0x7F800) >> 11;
 
         // If ext filter enabled write 1 to reg bit 3
+        // This is only needed for filters, masks enable is always false since this bit is reserved
         local extEn = (ext) ? 1 : 0;
         // Lower bits stand (grab 0-2 of id) write to reg bits 5-7,
         // Top bits Ext (grab 16-17 of id) write to reg bits 0-1,
-        data[1] = (id & 0x07) << 5 | extEn << 3 | (id << 27) & 0x03;
+        data[1] = (id & 0x07) << 5 | extEn << 3 | (id >> 27) & 0x03;
 
         // Set to configure mode
         local mode = _getReg(MCP2515_CAN_STATUS_REG)[0] & MCP2515_OP_MODE_MASK;

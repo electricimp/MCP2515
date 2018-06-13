@@ -231,55 +231,6 @@ canBus.configureRxBuffPins(MCP2515_TXRTS_PINS_DIG_IN);
 canBus.configureRxBuffPins(MCP2515_TX0RTS_PIN_RTS | MCP2515_TX1RTS_PIN_RTS);
 ```
 
-### configureFilter(*filterNum, ext, idFilter*)
-
-This method configures filters to be applied to incoming messages.
-
-#### Parameters ####
-
-| Parameter | Type | Default | Description |
-| --- | --- | --- | --- |
-| *filterNum* | integer | N/A | Accepted values: 0-5. Filters 0-1 will effect messages loaded into RX Buffer 0. Filters 2-5 effect messages loaded into RX Buffer 1. |
-| *ext*       | boolean | N/A | If `true` the id filter will be applied to incoming extended messages, if `false` filter will be applied to incoming standard messages. |
-| *idFilter*  | integer | N/A | Incoming messages with id's that match the *idFilter* will be loaded into the receive buffer. |
-
-#### Return Value ####
-
-Nothing.
-
-#### Example ####
-
-```
-// Configure RX buffer 0 filters to only accept messages with standard ids of 5 and 10.
-canBus.configureFilter(0, false, 5);
-canBus.configureFilter(1, false, 10);
-```
-
-### configureMask(*maskNum, ext, idMask*)
-
-This method configures the masks used to filter incoming messages. The length of the *idMask* parameter will determine if the mask is applied to standard or extended messages.
-
-#### Parameters ####
-
-| Parameter | Type | Default | Description |
-| --- | --- | --- | --- |
-| *maskNum* | integer | N/A | Accepted values: 0-1. Mask 0 will effect messages loaded into RX Buffer 0. Mask 1 will effect messages loaded into RX Buffer 1. |
-| *ext*     | boolean | N/A | If `true` the id mask will be applied to incoming extended messages, if `false` mask will be applied to incoming standard messages. |
-| *idMask*  | integer | N/A | If id mask bit is set to `1` messages will only be loaded into the RX buffer if they match the filters for that buffer. If id mask bit is set to `0` filters for that bit will be bypassed. |
-
-#### Return Value ####
-
-Nothing.
-
-#### Example ####
-
-```
-// Configure standard message mask for RX buffer 0.
-canBus.configureFilter(0, false, 0x0F);
-// Configure extended message mask for RX buffer 1.
-canBus.configureFilter(1, true, 0x1F000000);
-```
-
 ### enableMasksAndFilters(*enable*)
 
 This method enables or disables message filtering based on the mask and filters set with *configureMask()* and *configureFilter()* methods.
@@ -306,7 +257,7 @@ canBus.enableMasksAndFilters(false);
 
 ### clearFiltersAndMasks()
 
-This method sets all masks and filters to default state - all mask and filter ids set to zero.
+This method sets all masks and filters to default state - all mask and filter ids set to `0`.
 
 #### Return Value ####
 
@@ -319,9 +270,70 @@ Nothing.
 canBus.clearFiltersAndMasks();
 ```
 
+### configureMask(*maskNum, idMask*)
+
+This method configures the masks used to filter incoming messages.
+
+**Note:** The init method configures masks to all `0`, bypass filter.
+
+#### Parameters ####
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| *maskNum* | integer | N/A | Accepted values: 0-1. Mask 0 will effect messages loaded into RX Buffer 0. Mask 1 will effect messages loaded into RX Buffer 1. |
+| *idMask*  | integer | N/A | If id mask bit is set to `1` messages will only be loaded into the RX buffer if they match the filters for that buffer. If id mask bit is set to `0` filters for that bit will be bypassed. |
+
+#### Return Value ####
+
+Nothing.
+
+#### Example ####
+
+```
+// Configuring mask 0 on RX buffer 0 to filter on standard message ids.
+canBus.configureMask(0, 0x7FF);
+// Configuring mask 1 on RX buffer 1 to filter on standard message ids.
+canBus.configureMask(1, 0x7FF);
+
+canBus.enableMasksAndFilters(true);
+```
+
+### configureFilter(*filterNum, ext, idFilter*)
+
+This method configures filters to be applied to incoming messages.
+
+**Note:** The init method configures masks to all `0`, bypass filter. For filters to take effect mask bits must be configured.
+
+#### Parameters ####
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| *filterNum* | integer | N/A | Accepted values: 0-5. Filters 0-1 will effect messages loaded into RX Buffer 0. Filters 2-5 effect messages loaded into RX Buffer 1. |
+| *ext*       | boolean | N/A | If `true` the id filter will be applied to incoming extended messages, if `false` filter will be applied to incoming standard messages. |
+| *idFilter*  | integer | N/A | Incoming messages with id's that match the *idFilter* will be loaded into the receive buffer. |
+
+#### Return Value ####
+
+Nothing.
+
+#### Example ####
+
+```
+// Configuring mask 0 on RX buffer 0 to filter on standard message ids.
+canBus.configureMask(0, 0x7FF);
+// Configuring mask 1 on RX buffer 1 to filter on standard message ids.
+canBus.configureMask(1, 0x7FF);
+
+// Configure RX buffer 0 filters to only accept messages with standard ids of 5 and 10.
+canBus.configureFilter(0, false, 5);
+canBus.configureFilter(1, false, 10);
+
+canBus.enableMasksAndFilters(true);
+```
+
 ### readMsg()
 
-This method checks for messages, and if one if found it returns the message.
+This method checks for messages, and if one is found it returns the message.
 
 #### Return Value ####
 
