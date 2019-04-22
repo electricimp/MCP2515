@@ -423,6 +423,20 @@ class MCP2515 {
         return msg;
     }
 
+    function sendMsg(msg, buffer = 0) { 
+        local _txBuf = MCP2515_TX_BUFF_0_CTRL_REG;
+        switch (buffer) {
+            case 1:
+                _txBuf = MCP2515_TX_BUFF_1_CTRL_REG;
+                break;
+            case 2:
+                _txBuf = MCP2515_TX_BUFF_2_CTRL_REG;
+                break;
+        }
+        _writeMsgToBuffer(_txBuf, msg);
+        return _transmitBuffer(_txBuf);
+    }
+
     function getError() {
         local res = _getReg(MCP2515_ERROR_FLAG_REG);
         local errors = {};
@@ -533,6 +547,30 @@ class MCP2515 {
         // Read data out of buffer
         local data = _getReg(buffCtrlAddr + 6, dataLen);
         return {"extended" : ext, "rtr" : rtr, "rtrReceived" : rtrReceived, "id" : id, "data" : data};
+    }
+
+    function _writeMsgToBuffer(buffCtrlAddr, msg) {
+        if (msg.ext == true) {
+            //Extended Message
+            server.log("Extended Msg Tx not supported yet");
+        } else {
+            _writeReg(buffCtrlAddr + 1, msg.id >> 3);
+            _writeReg(buffCtrlAddr + 2, msg.id << 5 & 0xFF);
+        }
+        local _len = msg.data.len();
+        local _TXBnDLC = _len;
+        if (msg.rtr == true) {
+            _TXBnDLC = (_TXBnDLC | 0x40);
+        }
+        _writeReg(buffCtrlAddr + 5, _TXBnDLC);
+        for (local i=0; i<_len; i++) {
+            _writeReg(buffCtrlAddr + 6 + i, msg.data[i])
+        }
+    }
+
+    function _transmitBuffer(buffCtrlAddr) {
+        _writeReg(buffCtrlAddr, 0x08); // blind write at low priority
+        return _getReg(buffCtrlAddr, 1);
     }
 
     function _writeReg(addr, val) {
