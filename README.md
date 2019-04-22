@@ -1,8 +1,8 @@
 # MCP2515 #
 
-Driver for MCP2515, a stand-alone CAN controller with SPI interface. The MCP2515 is capable of transmitting and receiving both standard and extended data and remote frames. It has three transmit buffers with prioritization and abort features and two receive buffers. To filter out unwanted messages the MCP2515 has two acceptance masks and six acceptance filters. [MCP2515 Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/20001801H.pdf).
+Driver for MCP2515, a stand-alone CAN controller with SPI interface. The MCP2515 is capable of transmitting and receiving both standard and extended data and remote frames. It has three transmit buffers with prioritization and abort features and two receive buffers. To filter out unwanted messages the MCP2515 has two acceptance masks and six acceptance filters. [MCP2515 Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Stand-Alone-CAN-Controller-with-SPI-20001801J.pdf).
 
-**Note** This driver class is still under development, so some features of the MCP2515 are not implemented yet. Currently only message receive is implemented, and only 10mHz clock *Timing Suggestions* have been tested.
+**Note** This driver class is still under development, so some features of the MCP2515 are not implemented yet. Currently message receive and very basic transmit are implemented, and only 10mHz clock *Timing Suggestions* have been tested.
 
 **To use this driver copy and paste the** `MCP2515.device.lib.nut` **file into your device code.**
 
@@ -54,7 +54,7 @@ This method initializes the chip based on the settings in the *optionsTable*, an
 | *propSeg*      | integer  | 1 | Propagation Segment: compensates for physical delays between node. Supported values: 1 - 8 |
 | *phaseSeg1*    | integer  | 1 | Phase Segment 1: compensates for edge phase errors on the bus. Sample is taken at the end of Phase Segment 1. Supported values: 1-8 |
 | *phaseSeg2*    | integer  | 2 | Phase Segment 2: compensates for edge phase errors on the bus. Supported values 2-8 |
-| *sjw*          | integer  | 1 | Synchonization Jump Width: adjusts bit clock to keep in sync with transmitted message. Supported values: 1-4 |
+| *sjw*          | integer  | 1 | Synchronization Jump Width: adjusts bit clock to keep in sync with transmitted message. Supported values: 1-4 |
 | *samConfig*    | constant | MCP2515_SAM_3X | Sample Point Configuration: determines whether bus line is sampled one or three times at the sample point. Supported values: MCP2515_SAM_1X or MCP2515_SAM_3X |
 | *enSOF*        | boolean  | `true` | Sets CLKOUT pin configuration. When `true`, enables SOF signal. When `false` enables clock out function. |
 | *enWakeFilter* | boolean  | `false` | WakeUp Filter: `true` enables, `false` disables. |
@@ -86,7 +86,7 @@ canBus.init(canOpts);
 
 ### setOpMode(*mode*) ###
 
-Changes the opertation mode to the parameter *mode*.
+Changes the operation mode to the parameter *mode*.
 
 #### Parameters ####
 
@@ -102,7 +102,7 @@ Changes the opertation mode to the parameter *mode*.
 | MCP2515_OP_MODE_SLEEP | Internal Sleep mode used to minimize the current consumption of the device. WakeUp can be configured to wake from sleep mode. When device wakes it will default to Listen Only Mode. |
 | MCP2515_OP_MODE_LOOPBACK | Allows internal transmission of messages from the transmit buffers to the receive buffers without actually transmitting messages on the CAN bus. |
 | MCP2515_OP_MODE_LISTEN_ONLY | Receives all messages in silent mode. No messages or acks will be transmitted in this mode. Used for monitoring applications or detecting baud rate in "hot plugging" situations. |
-| MCP2515_OP_MODE_CONFIG | After power-up and reset the chip defaults to configuation mode. Used during initializaiton, and configuration of some registers. |
+| MCP2515_OP_MODE_CONFIG | After power-up and reset the chip defaults to configuration mode. Used during initialization, and configuration of some registers. |
 
 #### Return Value ####
 
@@ -117,7 +117,7 @@ if (mode != MCP2515_OP_MODE_NORMAL) server.error("Error: Not in normal mode.");
 
 ### reset() ###
 
-This method triggers a SPI reset. This is functionally equivalent to a harware reset. It is important to reset after power-up to ensure that the logic and registers are in their default state. The init method will trigger a reset before configuring options. After reset the MCP2515 will automatically be set into *Configuration Mode*.
+This method triggers a SPI reset. This is functionally equivalent to a hardware reset. It is important to reset after power-up to ensure that the logic and registers are in their default state. The init method will trigger a reset before configuring options. After reset the MCP2515 will automatically be set into *Configuration Mode*.
 
 #### Return Value ####
 
@@ -129,9 +129,9 @@ Nothing.
 canBus.reset();
 ```
 
-### configureInterrupts(*settings*)
+### configureInterrupts(*settings*) ###
 
-This method configures what interrupts if any will trigger the inerrupt pin to change state.
+This method configures what interrupts if any will trigger the interrupt pin to change state.
 
 #### Parameters ####
 
@@ -164,7 +164,7 @@ Nothing.
 canBus.configureInterrupts(MCP2515_EN_INT_RXB0 | MCP2515_EN_INT_RXB1);
 ```
 
-### configureRxBuffPins(*settings*)
+### configureRxBuffPins(*settings*) ###
 
 This method configures RX0BF and RX1BF pins. See configuration settings below. To configure both pins constants can be *or-ed*.
 
@@ -172,7 +172,7 @@ This method configures RX0BF and RX1BF pins. See configuration settings below. T
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| *settings* | constant(s) | N/A | Use the *RX Buffer Pin Constants* below to select the desired pin configuration settings. With the exeption of MCP2515_RXBF_PINS_DISABLE, constants can be *or-ed*. |
+| *settings* | constant(s) | N/A | Use the *RX Buffer Pin Constants* below to select the desired pin configuration settings. With the exception of MCP2515_RXBF_PINS_DISABLE, constants can be *or-ed*. |
 
 #### RX Buffer Pin Settings ####
 
@@ -197,7 +197,7 @@ Nothing.
 canBus.configureRxBuffPins(MCP2515_RX0BF_PIN_EN_DIG_OUT_HIGH | MCP2515_RX1BF_PIN_EN_DIG_OUT_HIGH);
 ```
 
-### configureTxRtsPins(*settings*)
+### configureTxRtsPins(*settings*) ###
 
 This method configures TX0RTS, TX1RTS and TX2RTS pins. See configuration settings below. To configure multiple RTS pins constants can be *or-ed*.
 
@@ -223,7 +223,7 @@ Nothing.
 #### Example ####
 
 ```
-// Enable TXRTS pins as digial inputs
+// Enable TXRTS pins as digital inputs
 canBus.configureRxBuffPins(MCP2515_TXRTS_PINS_DIG_IN);
 
 
@@ -231,7 +231,7 @@ canBus.configureRxBuffPins(MCP2515_TXRTS_PINS_DIG_IN);
 canBus.configureRxBuffPins(MCP2515_TX0RTS_PIN_RTS | MCP2515_TX1RTS_PIN_RTS);
 ```
 
-### enableMasksAndFilters(*enable*)
+### enableMasksAndFilters(*enable*) ###
 
 This method enables or disables message filtering based on the mask and filters set with *configureMask()* and *configureFilter()* methods.
 
@@ -255,7 +255,7 @@ canBus.enableMasksAndFilters(true);
 canBus.enableMasksAndFilters(false);
 ```
 
-### clearFiltersAndMasks()
+### clearFiltersAndMasks() ###
 
 This method sets all masks and filters to default state - all mask and filter ids set to `0`.
 
@@ -270,7 +270,7 @@ Nothing.
 canBus.clearFiltersAndMasks();
 ```
 
-### configureMask(*maskNum, idMask*)
+### configureMask(*maskNum, idMask*) ###
 
 This method configures the masks used to filter incoming messages.
 
@@ -298,7 +298,7 @@ canBus.configureMask(1, 0x7FF);
 canBus.enableMasksAndFilters(true);
 ```
 
-### configureFilter(*filterNum, ext, idFilter*)
+### configureFilter(*filterNum, ext, idFilter*) ###
 
 This method configures filters to be applied to incoming messages.
 
@@ -331,7 +331,7 @@ canBus.configureFilter(1, false, 10);
 canBus.enableMasksAndFilters(true);
 ```
 
-### readMsg()
+### readMsg() ###
 
 This method checks for messages, and if one is found it returns the message.
 
@@ -343,7 +343,7 @@ A message table or `null` if no message is found.
 | --- | --- | --- |
 | id          | integer | Message identifier |
 | data        | blob    | Message data |
-| extended    | boolean | `true` if message is exteneded format |
+| extended    | boolean | `true` if message is extended format |
 | rtr         | boolean | `true` if remote transmit requested |
 | rtrReceived | boolean | `true` if remote transfer request received |
 
@@ -358,7 +358,46 @@ if (msg != null) {
 }
 ```
 
-### getError()
+### sendMsg(*msg[, buffer]*) ###
+
+This method writes message to the specified buffer, if no buffer is specified it will default to transmit control buffer 0. Then flags the buffer with transmission pending. The message priority is set to lowest priority.
+
+#### Parameters ####
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| *msg* | Table | N/A | See [Message Table](#message-table) below. |
+| *buffer* | Integer | 0 | Transmit buffer to be used. Supported values: 0, 1, 2. If an invalid buffer is selected the default 0 will be used. |
+
+#### Return Value ####
+
+The contents of the buffer's control register.
+
+##### Message Table #####
+
+**Note** All keys are required. 
+
+| Key | Value Type | Value |
+| --- | --- | --- |
+| id          | integer | Message identifier |
+| data        | blob    | Message data |
+| extended    | boolean | `true` if message is extended format. Extended format is not currently supported. If set to `true` not message will be stored and an error message will be logged. |
+| rtr         | boolean | `true` if remote transmit requested |
+
+#### Example ####
+
+```
+local msg = {
+    "id"       : 0x14,
+    "data"     : 0x01,
+    "extended" : false,
+    "rtr"      : false
+}
+
+canBus.sendMsg(msg);
+```
+
+### getError() ###
 
 This method reads the error register and returns a table with error status'.
 
@@ -392,7 +431,7 @@ if (errors.errorFound) {
 
 ## Timing Notes ##
 
-Bit Timing notes from [Applicaton notes for MCP2510](http://ww1.microchip.com/downloads/en/AppNotes/00739a.pdf).
+Bit Timing notes from [Application notes for MCP2510](http://ww1.microchip.com/downloads/en/AppNotes/00739a.pdf).
 
 Every bit time is made up of four segments:
 
@@ -418,12 +457,12 @@ There are four rules that must be adhered to when programming the timing segment
 
 1. PS2 ≥ IPT: Phase Segment 2 must be greater than or equal to the Information Processing Time (IPT) so that the bit level can be determined and processed by the CAN module before the beginning of the next bit in the stream. The IPT = 2 TQ so PS2(min) = 2 TQ.
 2. PropSeg + PS1 ≥ PS2: This requirement ensures the sample point is greater than 50% of the bit time.
-3. PS2 > SJW: PS2 must be larger than the SJW to avoid shortening the bit time to before the sample point. For example, if PS2 = 2 and SJW = 3, then a resynchronization to shorten the bit would place the end of the bit time at 1 TQ before the sample point.
+3. PS2 > SJW: PS2 must be larger than the SJW to avoid shortening the bit time to before the sample point. For example, if PS2 = 2 and SJW = 3, then a re-synchronization to shorten the bit would place the end of the bit time at 1 TQ before the sample point.
 4. PropSeg + PS1 ≥ TDELAY: This requirement ensures there is adequate time before the sample point. In fact, the PropSeg should be set to compensate for physical bus delays.
 
 ### Timing Suggestions ###
 
-| Clock Rate | Bus Speed | Baud Rate Prescaler | Propagation Segment | Phase Segment 1 | Phase Segment 2 | Synchonization Jump Width |
+| Clock Rate | Bus Speed | Baud Rate Prescaler | Propagation Segment | Phase Segment 1 | Phase Segment 2 | Synchronization Jump Width |
 | ---------- | --------- | ------------------- | ------------------- | --------------- | --------------- | ------------------------- |
 | 8mHz       | 1000kb/s  | 1                   | 1                   | 1               | 1               | 1                         |
 | 8mHz       | 500kb/s   | 1                   | 2                   | 3               | 2               | 1                         |
