@@ -248,6 +248,10 @@ class MCP2515 {
     // enMaskFilt - sets the RX buffer id mode
     // Baud rate preScaler, prop seg, phase seg 1, phase seg 2 (min val is 2), SJW (default 1)
     function init(opts = {}) {
+        // Check for a mis-applied argument
+        if (opts == null) opts = {};
+        if (typeof opts != "table") throw "MCP2515.init() takes settings as a table";
+
         // Reset to default state
         reset();
 
@@ -405,12 +409,12 @@ class MCP2515 {
             // get message, clear interrupt flag
             msg = _readMsgFromBuffer(MCP2515_RX_BUFF_1_CTRL_REG);
             _modifyReg(MCP2515_CAN_INT_FLAG_REG, 0x02, 0x00);
-        } 
+        }
 
         return msg;
     }
 
-    function sendMsg(msg, buffer = 0) { 
+    function sendMsg(msg, buffer = 0) {
         local _txBuf = MCP2515_TX_BUFF_0_CTRL_REG;
         switch (buffer) {
             case 1:
@@ -429,7 +433,7 @@ class MCP2515 {
         local errors = {};
         if (typeof res == "blob" && res.len() == 1) {
             local errorFlagReg = res[0];
-            errors.errorFound       <- (errorFlagReg != 0);           
+            errors.errorFound       <- (errorFlagReg != 0);
             errors.rxB1Overflow     <- (errorFlagReg & 0x01) == 0x01; // RX Buffer 1 overflow
             errors.rxB0Overflow     <- (errorFlagReg & 0x02) == 0x02; // RX Buffer 0 overflow
             errors.txBusOff         <- (errorFlagReg & 0x04) == 0x04; // TX Bus off
