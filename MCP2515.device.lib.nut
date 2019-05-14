@@ -216,7 +216,7 @@ const MCP2515_TX2RTS_PIN_RTS    = 0x04;
 
 class MCP2515 {
 
-    static VERSION = "0.1.0";
+    static VERSION = "0.2.0";
 
     _spi = null;
     _cs  = null;
@@ -248,6 +248,10 @@ class MCP2515 {
     // enMaskFilt - sets the RX buffer id mode
     // Baud rate preScaler, prop seg, phase seg 1, phase seg 2 (min val is 2), SJW (default 1)
     function init(opts = {}) {
+        // Check for a mis-applied argument
+        if (opts == null) opts = {};
+        if (typeof opts != "table") throw "MCP2515.init() takes settings as a table";
+
         // Reset to default state
         reset();
 
@@ -341,9 +345,6 @@ class MCP2515 {
     }
 
     function enableMasksAndFilters(enable) {
-        // server.log("In enable masks and filters. Enable: " + enable);
-        // server.log(format("Updating register: 0x%02X", MCP2515_RX_BUFF_0_CTRL_REG))
-        // server.log(format("Updating register: 0x%02X", MCP2515_RX_BUFF_1_CTRL_REG))
         if (enable) {
             _modifyReg(MCP2515_RX_BUFF_0_CTRL_REG, 0x64, 0x00); // don't mask off buffer rollover bit
             _modifyReg(MCP2515_RX_BUFF_1_CTRL_REG, 0x60, 0x00);
@@ -351,11 +352,6 @@ class MCP2515 {
             _modifyReg(MCP2515_RX_BUFF_0_CTRL_REG, 0x64, 0x60); // don't mask off buffer rollover bit
             _modifyReg(MCP2515_RX_BUFF_1_CTRL_REG, 0x60, 0x60);
         }
-
-        // local res = _getReg(MCP2515_RX_BUFF_0_CTRL_REG)[0]
-        // server.log(format("Register 0x%02X value: 0x%02X", MCP2515_RX_BUFF_0_CTRL_REG, res));
-        // res = _getReg(MCP2515_RX_BUFF_1_CTRL_REG)[0]
-        // server.log(format("Register 0x%02X value: 0x%02X", MCP2515_RX_BUFF_1_CTRL_REG, res));
     }
 
     // NOTE: Mask 0 - is mask for buffer 0, mask 1 is mask for buffer 1
@@ -403,24 +399,33 @@ class MCP2515 {
     function readMsg() {
         // Check for msgs in buffer 0 and 1
         local status = _readStatus();
-        // server.log(format("Status result: 0x%02X", status));
 
         local msg = null;
         if (status & 0x01) {
-            // server.log("We have msg in buffer 0");
             // get message, clear interrupt flag
             msg = _readMsgFromBuffer(MCP2515_RX_BUFF_0_CTRL_REG);
             _modifyReg(MCP2515_CAN_INT_FLAG_REG, 0x01, 0x00);
         } else if (status & 0x02) {
-            // server.log("We have msg in buffer 1");
             // get message, clear interrupt flag
             msg = _readMsgFromBuffer(MCP2515_RX_BUFF_1_CTRL_REG);
             _modifyReg(MCP2515_CAN_INT_FLAG_REG, 0x02, 0x00);
-        } else {
-            // server.log("No msg found.");
         }
 
         return msg;
+    }
+
+    function sendMsg(msg, buffer = 0) {
+        local _txBuf = MCP2515_TX_BUFF_0_CTRL_REG;
+        switch (buffer) {
+            case 1:
+                _txBuf = MCP2515_TX_BUFF_1_CTRL_REG;
+                break;
+            case 2:
+                _txBuf = MCP2515_TX_BUFF_2_CTRL_REG;
+                break;
+        }
+        _writeMsgToBuffer(_txBuf, msg);
+        return _transmitBuffer(_txBuf);
     }
 
     function getError() {
@@ -428,21 +433,20 @@ class MCP2515 {
         local errors = {};
         if (typeof res == "blob" && res.len() == 1) {
             local errorFlagReg = res[0];
-            errors.errorFound       <- (errorFlagReg != 0);           // server.log("Errors found");
-            errors.rxB1Overflow     <- (errorFlagReg & 0x01) == 0x01; // server.log("RX Buffer 1 overflow");
-            errors.rxB0Overflow     <- (errorFlagReg & 0x02) == 0x02; // server.log("RX Buffer 0 overflow");
-            errors.txBusOff         <- (errorFlagReg & 0x04) == 0x04; // server.log("TX Bus off");
-            errors.txErrorPassive   <- (errorFlagReg & 0x08) == 0x08; // server.log("TX Error Passive");
-            errors.rxErrorPassive   <- (errorFlagReg & 0x10) == 0x10; // server.log("RX Error Passive");
-            errors.txErrorWarning   <- (errorFlagReg & 0x20) == 0x20; // server.log("TX Error Warning");
-            errors.rxErrorWarning   <- (errorFlagReg & 0x40) == 0x40; // server.log("RX Error Warning");
-            errors.txRxErrorWarning <- (errorFlagReg & 0x80) == 0x80; // server.log("TX or RX Error Warning");
+            errors.errorFound       <- (errorFlagReg != 0);
+            errors.rxB1Overflow     <- (errorFlagReg & 0x01) == 0x01; // RX Buffer 1 overflow
+            errors.rxB0Overflow     <- (errorFlagReg & 0x02) == 0x02; // RX Buffer 0 overflow
+            errors.txBusOff         <- (errorFlagReg & 0x04) == 0x04; // TX Bus off
+            errors.txErrorPassive   <- (errorFlagReg & 0x08) == 0x08; // TX Error Passive
+            errors.rxErrorPassive   <- (errorFlagReg & 0x10) == 0x10; // RX Error Passive
+            errors.txErrorWarning   <- (errorFlagReg & 0x20) == 0x20; // TX Error Warning
+            errors.rxErrorWarning   <- (errorFlagReg & 0x40) == 0x40; // RX Error Warning
+            errors.txRxErrorWarning <- (errorFlagReg & 0x80) == 0x80; // TX or RX Error Warning
         }
         return errors;
     }
 
     function _configureMasksAndFilters(startingAddr, id, ext = false) {
-        // server.log("In configure masks and filters");
         local data = blob(4);
         // 0 = Standard High reg data (bits 3-10 of standard id)
         // 1 = Standard Low reg data (bits 0-2 of standard id, ext filter enable, and bits 16-17 ext id)
@@ -480,15 +484,8 @@ class MCP2515 {
         local mode = _getReg(MCP2515_CAN_STATUS_REG)[0] & MCP2515_OP_MODE_MASK;
         local res = setOpMode(MCP2515_OP_MODE_CONFIG);
 
-        // server.log(format("Writing data to registers starting at addr: 0x%02X", startingAddr));
-        // server.log(data);
-
         // Update register
         res = _writeReg(startingAddr, data);
-
-        // res = _getReg(startingAddr, 4);
-        // server.log(format("Data in registers starting at addr: 0x%02X", startingAddr))
-        // server.log(res);
 
         // Set back to non-config mode
         res = setOpMode(mode);
@@ -496,8 +493,6 @@ class MCP2515 {
 
     function _readMsgFromBuffer(buffCtrlAddr) {
         local res = _getReg(buffCtrlAddr, 6);
-        // server.log(format("Get readMsg data from registers starting at addr: 0x%02X", buffCtrlAddr));
-        // server.log(res);
         // [0] - CTRL, [1] - StandId high, [2] - StandId low
         // [3] - ExtId high, [4] - ExtId low, [5] - Data len
 
@@ -533,6 +528,32 @@ class MCP2515 {
         // Read data out of buffer
         local data = _getReg(buffCtrlAddr + 6, dataLen);
         return {"extended" : ext, "rtr" : rtr, "rtrReceived" : rtrReceived, "id" : id, "data" : data};
+    }
+
+    function _writeMsgToBuffer(buffCtrlAddr, msg) {
+        if (msg.extended == true) {
+            //Extended Message
+            server.error("ERROR: Unable to store message. Extended Msg Tx not supported yet");
+        } else {
+            _writeReg(buffCtrlAddr + 1, msg.id >> 3);
+            _writeReg(buffCtrlAddr + 2, msg.id << 5 & 0xFF);
+        }
+
+        local _len = msg.data.len();
+        local _TXBnDLC = _len;
+        if (msg.rtr == true) {
+            _TXBnDLC = (_TXBnDLC | 0x40);
+        }
+        _writeReg(buffCtrlAddr + 5, _TXBnDLC);
+        local ctrlAddrBase = buffCtrlAddr + 6;
+        for (local i = 0; i < _len; i++) {
+            _writeReg(ctrlAddrBase + i, msg.data[i]);
+        }
+    }
+
+    function _transmitBuffer(buffCtrlAddr) {
+        _writeReg(buffCtrlAddr, 0x08); // blind write at low priority
+        return _getReg(buffCtrlAddr, 1);
     }
 
     function _writeReg(addr, val) {
