@@ -4,15 +4,15 @@ This library provides a driver for the [Microchip MCP2515](https://www.microchip
 
 **Note** This driver is still under development. Not all of the MCP2515’s features have yet been implemented. Currently, message reception and very basic message transmission are implemented, and only 10MHz clock [timing suggestions](#timing-suggestions) have been tested.
 
-**To include this driver in your project, paste the contents of the** `MCP2515.device.lib.nut` **file at the top of your device code.**
+**To add this driver in your project, add** `#require "MCP2515.device.lib.nut:0.2.0"` **to the top of your device code.**
 
 ## Class Usage ##
 
 ### constructor(*spiBus[, chipSelectPin]*) ###
 
-The driver is instantiated with a pre-configured imp SPI bus object and, optionally, an imp pin object to which the Chip Select (CS) line is connected. The chip select pin will be configured by the constructor, though the SPI bus will not be. If no CS pin is specified, the imp API method [**spi.chipselect()**](https://developer.electricimp.com/api/hardware.spi/chipselect) will be used to drive the CS pin.
+The driver is instantiated with a pre-configured imp SPI bus object and, optionally, an imp pin object to which the Chip Select (CS) line is connected. The chip select pin will be configured by the constructor, though the SPI bus will not be. If no CS pin is specified, the imp API method [**spi.chipselect()**](https://developer.electricimp.com/api/hardware/spi/chipselect) will be used to drive the CS pin.
 
-**Note** [**spi.chipselect()**](https://developer.electricimp.com/api/hardware.spi/chipselect) is only available on imps with a dedicated chip select pin and can only be used when the SPI bus is configured with **USE_CS_L** mode flag.
+**Note** [**spi.chipselect()**](https://developer.electricimp.com/api/hardware/spi/chipselect) is only available on imps with a dedicated chip select pin and can only be used when the SPI bus is configured with **USE_CS_L** mode flag.
 
 #### Parameters ####
 
@@ -236,8 +236,7 @@ canBus.configureRxBuffPins(MCP2515_TX0RTS_PIN_RTS | MCP2515_TX1RTS_PIN_RTS);
 
 ### enableMasksAndFilters(*enable*) ###
 
-This method enables or disables message filtering based on the mask and filters set with [*configureMask()*](#configuremaskmasknum-maskid) and [*configureFilter()*](#configurefilterfilternum-extended-filterid) methods.
-
+This method enables or disables message filtering based on the mask and filters set with [*configureMask()*](#configuremaskbuffer-mask) and [*configureFilter()*](#configurefilterfilternumber-extended-filterid) methods.
 #### Parameters ####
 
 | Parameter | Type | Required? | Description |
