@@ -4,7 +4,7 @@ This library provides a driver for the [Microchip MCP2515](https://www.microchip
 
 **Note** This driver is still under development. Not all of the MCP2515’s features have yet been implemented. Currently, message reception and very basic message transmission are implemented, and only 10MHz clock [timing suggestions](#timing-suggestions) have been tested.
 
-**To add this driver in your project, add** `#require "MCP2515.device.lib.nut:0.2.0"` **to the top of your device code.**
+**To include this library in your project, add** `#require "MCP2515.device.lib.nut:0.2.0"` **at the top of your device code.**
 
 ## Class Usage ##
 
@@ -510,3 +510,7 @@ There are four rules that must be adhered to when programming the timing segment
 | 20MHz | 80Kb/s | 5 | 8 | 8 | 8 | 4 |
 | 20MHz | 50Kb/s | 10 | 7 | 7 | 5 | 2 |
 | 20MHz | 40Kb/s | 25 | 4 | 3 | 2 | 1 |
+
+## License ##
+
+This library is licensed under the [MIT license](./LICENSE).
