@@ -38,20 +38,20 @@ canBus <- MCP2515(spi, cs);
 
 ### init(*[settings]*) ###
 
-This method initializes the MCP2515 based on the settings specified, if any, in the table passed into *settings*. It will reset the MCP2515 to get into an known state before applying the settings. If no settings table is passed in, default settings will be applied: a 10MHz clock with a transmit speed of 1000Kb/s and no receive message filtering or interrupts enabled. For possible clock and speed settings, please see [‘Timing Notes’](#timing-notes), below.
+This method initializes the MCP2515 based on the settings specified, if any, in the table passed into *settings*. It will reset the MCP2515 to get into an known state before applying the settings. If no settings table is passed in, default settings will be applied: a 10MHz clock with a transmit speed of 1000Kb/s and no receive message filtering or interrupts enabled. For possible clock and speed settings, please see [**Timing Notes**](#timing-notes), below.
 
 #### Parameters ####
 
 | Parameter | Type | Required? | Description |
 | --- | --- | --- | --- |
-| *settings* | Table | No | A table containing desired configuration information (see [MCP2515 Settings](#mcp2515-settings), below) |
+| *settings* | Table | No | A table containing desired configuration information (see [**MCP2515 Settings**](#mcp2515-settings), below) |
 
 #### MCP2515 Settings ####
 
 | Parameter | Type | Description |
 | --- | --- | --- |
 | *enFiltering* | Boolean | Whether filtering should be enabled (`true`) or not (`false`). Default: `false` |
-| *opMode* | Constant | The operation mode after configuration. For supported values, please see [‘Operation Mode Constants’](#operation-mode-constants), below. Default: *MCP2515_OP_MODE_NORMAL* |
+| *opMode* | Constant | The operation mode after configuration. For supported values, please see [**Operation Mode Constants**](#operation-mode-constants), below. Default: *MCP2515_OP_MODE_NORMAL* |
 | *baudRatePre* | Integer | Baud Rate Pre-scaler. A multiplier that keeps the CAN bit-timing values in a programable range. Supported values: 1-128. Default: 1 |
 | *propSeg* | Integer | Propagation Segment. Compensates for physical delays between nodes. Supported values: 1-8. Default: 1 |
 | *phaseSeg1* | Integer | Phase Segment 1. Compensates for edge phase errors on the bus. Sample is taken at the end of phase segment 1. Supported values: 1-8. Default: 1 |
@@ -60,9 +60,9 @@ This method initializes the MCP2515 based on the settings specified, if any, in 
 | *samConfig* | Constant | Sample point Configuration. Determines whether the bus line is sampled once or three times at the sample point. Supported values: *MCP2515_SAM_1X* or *MCP2515_SAM_3X*. Default: *MCP2515_SAM_3X* |
 | *enSOF* | Boolean | Sets CLKOUT pin configuration. When `true`, enables SOF signal; when `false`, enables clock out function. Default: `true` |
 | *enWakeFilter* | Boolean | Enable the Wake Filter: `true` enables the filter, `false` disables it. Default: `false` |
-| *intConfig* | Constant | Configures interrupts. For supported values, please see [‘Interrupt Configuration Constants’](#interrupt-configuration-constants). Default: *MCP2515_DISABLE_ALL_INTS* |
-| *configRxPins* | Constant | Configure the RX0BF and RX1BF pins. For supported values, please see [‘RX Buffer Pin Constants’](#rx-buffer-pin-constants), below. Default: *MCP2515_RXBF_PINS_DISABLE* |
-| *configTxPins* | Constant | Configures the TX Request To Send (RTS) pins. For supported values, please see [‘TX RTS Pin Constants’](#tx-rts-pin-constants), below. Default: *MCP2515_TXRTS_PINS_DIG_IN* |
+| *intConfig* | Constant | Configures interrupts. For supported values, please see [**Interrupt Configuration Constants**](#interrupt-configuration-constants). Default: *MCP2515_DISABLE_ALL_INTS* |
+| *configRxPins* | Constant | Configure the RX0BF and RX1BF pins. For supported values, please see [**RX Buffer Pin Constants**](#rx-buffer-pin-constants), below. Default: *MCP2515_RXBF_PINS_DISABLE* |
+| *configTxPins* | Constant | Configures the TX Request To Send (RTS) pins. For supported values, please see [**TX RTS Pin Constants**](#tx-rts-pin-constants), below. Default: *MCP2515_TXRTS_PINS_DIG_IN* |
 
 #### Return Value ####
 
@@ -96,7 +96,7 @@ This method changes the operation mode to the specified value.
 
 | Parameter | Type | Required? | Description |
 | --- | --- | --- | --- |
-| *mode* | Constant | No | See [‘Operation Mode Constants’](#operation-mode-constants), below |
+| *mode* | Constant | No | See [**Operation Mode Constants**](#operation-mode-constants), below |
 
 #### Operation Mode Constants ####
 
@@ -121,7 +121,7 @@ if (mode != MCP2515_OP_MODE_NORMAL) server.error("Error: Not in normal mode.");
 
 ### reset() ###
 
-This method triggers a SPI reset. This is functionally equivalent to a hardware reset. It is important to reset after power-up to ensure that the logic and registers are in their default state. The [*init()*](#initsettings) method will trigger a reset before applying any specified configuration options. After reset, the MCP2515 will automatically be placed in configuration mode (see [‘Operation Mode Constants’](#operation-mode-constants), above).
+This method triggers a SPI reset. This is functionally equivalent to a hardware reset. It is important to reset after power-up to ensure that the logic and registers are in their default state. The [*init()*](#initsettings) method will trigger a reset before applying any specified configuration options. After reset, the MCP2515 will automatically be placed in configuration mode (see [**Operation Mode Constants**](#operation-mode-constants), above).
 
 #### Return Value ####
 
@@ -431,7 +431,7 @@ if (errors.errorFound) {
 
 ## Timing Notes ##
 
-**Note** The following bit timing guidance comes from [‘Application Notes For MCP2510’](http://ww1.microchip.com/downloads/en/AppNotes/00739a.pdf).
+**Note** The following bit timing guidance comes from [**Application Notes For MCP2510**](http://ww1.microchip.com/downloads/en/AppNotes/00739a.pdf).
 
 Every bit time is made up of four segments:
 
